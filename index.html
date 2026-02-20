@@ -7,474 +7,260 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #09090b;
-    --surface: #111114;
-    --surface2: #17171b;
-    --border: #1f1f25;
-    --border-light: #2a2a32;
-    --text: #e4e4e7;
-    --text-muted: #52525b;
-    --text-dim: #71717a;
-    --green: #22c55e;
-    --green-bg: rgba(34,197,94,.08);
-    --red: #ef4444;
-    --red-bg: rgba(239,68,68,.08);
-    --accent: #6366f1;
-    --accent-glow: rgba(99,102,241,.12);
+  :root{
+    --bg:#09090b;--surface:#111114;--surface2:#17171b;
+    --border:#1f1f25;--border-light:#2a2a32;
+    --text:#e4e4e7;--text-muted:#52525b;--text-dim:#71717a;
+    --green:#22c55e;--green-bg:rgba(34,197,94,.08);
+    --red:#ef4444;--red-bg:rgba(239,68,68,.08);
+    --accent:#6366f1;--accent-glow:rgba(99,102,241,.12);
   }
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'DM Mono', monospace;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 12.5px;
-    line-height: 1.5;
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);font-size:12.5px;line-height:1.5;}
+
+  /* HEADER */
+  .header{
+    padding:16px 22px 12px;border-bottom:1px solid var(--border);
+    display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+    background:linear-gradient(180deg,#0d1015 0%,var(--bg) 100%);
+  }
+  .manager-tag{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;}
+  .manager-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
+  .header-right{display:flex;align-items:center;gap:14px;}
+  .update-info{text-align:right;font-size:10px;color:var(--text-muted);line-height:1.7;}
+  .update-info strong{color:var(--text-dim);}
+  .live-badge{display:flex;align-items:center;gap:5px;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);}
+  .live-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+  /* TOOLBAR */
+  .toolbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 18px;border-bottom:1px solid var(--border);
+    background:var(--surface);gap:8px;flex-wrap:wrap;
+  }
+  .search-wrap{position:relative;}
+  .search-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
+  .search-input{
+    background:var(--bg);border:1px solid var(--border-light);border-radius:4px;
+    padding:5px 10px 5px 26px;color:var(--text);font-family:'DM Mono',monospace;
+    font-size:11px;width:200px;outline:none;transition:border-color .2s;
+  }
+  .search-input:focus{border-color:var(--accent);}
+  .search-input::placeholder{color:var(--text-muted);}
+  .filter-group{display:flex;gap:4px;flex-wrap:wrap;}
+  .filter-btn{
+    padding:4px 10px;border-radius:4px;border:1px solid var(--border-light);
+    background:transparent;color:var(--text-dim);font-family:'DM Mono',monospace;
+    font-size:10px;cursor:pointer;transition:all .15s;
+  }
+  .filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .filter-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent);}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:820px;}
+  thead tr{border-bottom:1px solid var(--border-light);}
+  th{
+    padding:9px 13px;font-size:9.5px;font-weight:500;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--text-muted);text-align:left;
+    white-space:nowrap;cursor:pointer;user-select:none;
+    position:sticky;top:0;background:var(--surface);z-index:1;transition:color .15s;
+  }
+  th:hover{color:var(--text-dim);}
+  th.sorted{color:var(--accent);}
+  th.r,td.r{text-align:right;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;animation:fadeRow .2s ease both;opacity:0;}
+  tbody tr:hover{background:var(--surface2);}
+  tbody tr.closed{opacity:.48;}
+  tbody tr.closed:hover{opacity:.72;background:var(--surface2);}
+  @keyframes fadeRow{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+  td{padding:10px 13px;font-size:12px;white-space:nowrap;}
+
+  .val-name{font-weight:500;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;}
+  .val-ticker{font-size:10px;color:var(--text-muted);margin-top:1px;letter-spacing:.05em;}
+  .flag{margin-right:3px;}
+  .price-val{font-weight:500;}
+  .price-cur{font-size:10px;color:var(--text-muted);margin-left:2px;}
+  .date-val{color:var(--text-dim);font-size:11px;}
+
+  .perf-badge{
+    display:inline-flex;align-items:center;gap:3px;
+    padding:3px 8px;border-radius:3px;font-size:11.5px;font-weight:500;
+  }
+  .perf-badge.up  {background:var(--green-bg);color:var(--green);}
+  .perf-badge.down{background:var(--red-bg);  color:var(--red);}
+  .perf-badge.flat{background:var(--surface2);color:var(--text-dim);}
+
+  .status-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;}
+  .status-pill.open  {background:var(--green-bg);color:var(--green);}
+  .status-pill.closed{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border-light);}
+
+  /* FOOTER */
+  .footer{
+    padding:9px 18px;border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:10px;color:var(--text-muted);flex-wrap:wrap;gap:8px;
+    background:var(--surface);
   }
 
-  /* ── SOURCE BAR ── */
-  .source-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    flex-wrap: wrap;
-  }
-  .source-label {
-    font-size: 9.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .tab-btn {
-    padding: 4px 12px;
-    border-radius: 4px;
-    border: 1px solid var(--border-light);
-    background: transparent;
-    color: var(--text-dim);
-    font-family: 'DM Mono', monospace;
-    font-size: 10.5px;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .source-input {
-    flex: 1;
-    min-width: 240px;
-    max-width: 460px;
-    background: var(--bg);
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 5px 10px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .source-input:focus { border-color: var(--accent); }
-  .source-input::placeholder { color: var(--text-muted); }
-  .load-btn {
-    padding: 5px 14px;
-    border-radius: 4px;
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    transition: opacity .15s;
-    white-space: nowrap;
-  }
-  .load-btn:hover { opacity: .85; }
-  .file-label {
-    padding: 5px 14px;
-    border-radius: 4px;
-    border: 1px solid var(--border-light);
-    color: var(--text-dim);
-    font-size: 11px;
-    cursor: pointer;
-    transition: all .15s;
-    white-space: nowrap;
-  }
-  .file-label:hover { border-color: var(--accent); color: var(--accent); }
-  #csvFileInput { display: none; }
-  .source-status { font-size: 10px; color: var(--text-muted); font-style: italic; }
-
-  /* ── HEADER ── */
-  .header {
-    padding: 18px 24px 14px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .manager-tag {
-    font-size: 9.5px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-  }
-  .manager-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -.02em;
-    color: var(--text);
-  }
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 9.5px;
-    font-weight: 500;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--green);
-  }
-  .live-dot {
-    width: 5px; height: 5px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: blink 2s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
-
-  /* ── TOOLBAR ── */
-  .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .search-wrap { position: relative; }
-  .search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
-  .search-input {
-    background: var(--bg);
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-    padding: 5px 10px 5px 28px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 11.5px;
-    width: 220px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .search-input::placeholder { color: var(--text-muted); }
-  .search-input:focus { border-color: var(--accent); }
-  .filter-group { display: flex; gap: 5px; }
-  .filter-btn {
-    padding: 4px 11px;
-    border-radius: 4px;
-    border: 1px solid var(--border-light);
-    background: transparent;
-    color: var(--text-dim);
-    font-family: 'DM Mono', monospace;
-    font-size: 10.5px;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .filter-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
-
-  /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 860px; }
-  thead tr { border-bottom: 1px solid var(--border-light); background: var(--surface); }
-  th {
-    padding: 9px 14px;
-    font-size: 9.5px;
-    font-weight: 500;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    text-align: left;
-    white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
-    transition: color .15s;
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    z-index: 1;
-  }
-  th:hover { color: var(--text-dim); }
-  th.sorted { color: var(--accent); }
-  th.r, td.r { text-align: right; }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .1s;
-    animation: fadeRow .22s ease both;
-    opacity: 0;
-  }
-  tbody tr:hover { background: var(--surface2); }
-  tbody tr.closed { opacity: .48; }
-  tbody tr.closed:hover { opacity: .72; background: var(--surface2); }
-  @keyframes fadeRow { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
-
-  td { padding: 10px 14px; font-size: 12px; white-space: nowrap; }
-
-  .val-name { font-weight: 500; color: var(--text); max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
-  .val-ticker { font-size: 10px; color: var(--text-muted); margin-top: 1px; letter-spacing: .05em; }
-
-  .flag { margin-right: 4px; }
-
-  .gerant-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: 10px;
-    background: var(--accent-glow);
-    color: var(--accent);
-    border: 1px solid rgba(99,102,241,.18);
-    white-space: nowrap;
-  }
-
-  .price-val { font-weight: 500; }
-  .price-cur { font-size: 10px; color: var(--text-muted); margin-left: 2px; }
-
-  .perf-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 11.5px;
-    font-weight: 500;
-  }
-  .perf-badge.up   { background: var(--green-bg); color: var(--green); }
-  .perf-badge.down { background: var(--red-bg);   color: var(--red);   }
-  .perf-badge.flat { background: var(--surface2); color: var(--text-dim); }
-
-  .status-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 10px;
-  }
-  .status-pill.open   { background: var(--green-bg); color: var(--green); }
-  .status-pill.closed { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border-light); }
-
-  .date-val { color: var(--text-dim); font-size: 11px; }
-
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 52px 20px;
-    color: var(--text-muted);
-  }
-  .empty-state .icon { font-size: 28px; margin-bottom: 10px; }
-  .empty-state p { font-size: 12px; line-height: 1.8; }
-  .empty-state strong { color: var(--text-dim); }
-
-  /* ── FOOTER ── */
-  .footer {
-    padding: 10px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 10px;
-    color: var(--text-muted);
-    flex-wrap: wrap;
-    gap: 8px;
-    background: var(--surface);
-  }
-
-  /* ── ERROR ── */
-  .error-box {
-    margin: 10px 20px;
-    padding: 10px 14px;
-    border-radius: 4px;
-    background: rgba(239,68,68,.08);
-    border: 1px solid rgba(239,68,68,.22);
-    color: var(--red);
-    font-size: 11.5px;
-    display: none;
-  }
+  /* STATES */
+  .state-row td{text-align:center;padding:48px 20px;color:var(--text-muted);}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .err-box{margin:10px 18px;padding:10px 14px;border-radius:4px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:var(--red);font-size:11px;display:none;}
 </style>
 </head>
 <body>
-
-<!-- SOURCE BAR -->
-<div class="source-bar">
-  <span class="source-label">Source</span>
-  <button class="tab-btn active" onclick="switchTab('sheet', this)">Google Sheet</button>
-  <button class="tab-btn" onclick="switchTab('csv', this)">Fichier CSV</button>
-
-  <div id="sheetWrap" style="display:flex;gap:8px;align-items:center;flex:1;">
-    <input class="source-input" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/VOTRE_ID/...">
-    <button class="load-btn" onclick="loadSheet()">Connecter</button>
-  </div>
-
-  <div id="csvWrap" style="display:none;gap:8px;align-items:center;">
-    <label class="file-label" for="csvFileInput">📂 Choisir un CSV</label>
-    <input type="file" id="csvFileInput" accept=".csv" onchange="loadCSV(this)">
-    <span class="source-status" id="csvName">Aucun fichier</span>
-  </div>
-
-  <span class="source-status" id="srcStatus">Aucune donnée</span>
-</div>
 
 <!-- HEADER -->
 <div class="header">
   <div>
     <div class="manager-tag">Portefeuille · CVATP</div>
-    <div class="manager-name" id="managerName">—</div>
+    <div class="manager-name" id="managerName">Chargement…</div>
   </div>
-  <div class="live-badge">
-    <span class="live-dot"></span> Temps réel
+  <div class="header-right">
+    <div class="update-info">
+      <div>Dernière mise à jour</div>
+      <strong id="updateVal">—</strong>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span>Temps réel</div>
   </div>
 </div>
 
 <!-- TOOLBAR -->
 <div class="toolbar">
   <div class="search-wrap">
-    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input class="search-input" id="searchInput" placeholder="Rechercher…" oninput="render()">
   </div>
   <div class="filter-group">
-    <button class="filter-btn active" onclick="setFilter('all', this)">Toutes</button>
-    <button class="filter-btn" onclick="setFilter('open', this)">Ouvertes</button>
-    <button class="filter-btn" onclick="setFilter('closed', this)">Clôturées</button>
-    <button class="filter-btn" onclick="setFilter('pos', this)">▲ Positives</button>
-    <button class="filter-btn" onclick="setFilter('neg', this)">▼ Négatives</button>
+    <button class="filter-btn active" onclick="setFilter('all',this)">Toutes</button>
+    <button class="filter-btn" onclick="setFilter('open',this)">Ouvertes</button>
+    <button class="filter-btn" onclick="setFilter('closed',this)">Clôturées</button>
+    <button class="filter-btn" onclick="setFilter('pos',this)">▲ Positives</button>
+    <button class="filter-btn" onclick="setFilter('neg',this)">▼ Négatives</button>
   </div>
 </div>
 
 <!-- ERROR -->
-<div class="error-box" id="errBox"></div>
+<div class="err-box" id="errBox"></div>
 
 <!-- TABLE -->
 <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th onclick="sort('valeur', this)">Valeur</th>
-        <th onclick="sort('pays', this)">Pays</th>
-        <th onclick="sort('gerant', this)">Gérant</th>
-        <th class="r" onclick="sort('achatCours', this)">Achat</th>
-        <th class="r" onclick="sort('achatDate', this)">Date achat</th>
-        <th class="r" onclick="sort('venteCours', this)">Vente</th>
-        <th class="r" onclick="sort('venteDate', this)">Date vente</th>
-        <th class="r" onclick="sort('dernierCours', this)">Dernier cours</th>
-        <th class="r" onclick="sort('perf', this)">Perf. %</th>
+        <th onclick="sort('valeur',this)">Valeur</th>
+        <th onclick="sort('pays',this)">Pays</th>
+        <th class="r" onclick="sort('achatCours',this)">Achat</th>
+        <th class="r" onclick="sort('achatDate',this)">Date achat</th>
+        <th class="r" onclick="sort('venteCours',this)">Vente</th>
+        <th class="r" onclick="sort('venteDate',this)">Date vente</th>
+        <th class="r" onclick="sort('dernierCours',this)">Dernier cours</th>
+        <th class="r" onclick="sort('perf',this)">Perf. %</th>
         <th>Statut</th>
       </tr>
     </thead>
     <tbody id="tbody">
-      <tr><td colspan="10">
-        <div class="empty-state">
-          <div class="icon">📊</div>
-          <p><strong>Aucune donnée chargée.</strong><br>Connectez un Google Sheet ou importez un fichier CSV.</p>
-        </div>
-      </td></tr>
+      <tr class="state-row"><td colspan="9"><span class="spinner"></span>Chargement des données…</td></tr>
     </tbody>
   </table>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-  <span>Cotation Google Finance · Source : <span id="footerSrc">—</span></span>
+  <span>Cotation Google Finance · Source Google Sheets</span>
   <span id="footerCount"></span>
 </div>
 
 <script>
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  CONFIG — À MODIFIER
+//  1. Remplacer SHEET_ID par l'ID du Google Sheet du client
+//  2. Le Sheet doit être partagé "Tout le monde peut voir"
+//  3. Dans Google Sites, intégrer via :
+//     https://suceleste.github.io/CVATP_Tracker?gerant=Alain+Pitous
+// ═══════════════════════════════════════════════════════
+const SHEET_ID   = 'VOTRE_SHEET_ID_ICI';
+const SHEET_NAME = 'Au cours du jour';
+const SHEET_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+// ═══════════════════════════════════════════════════════
+//  LIRE LE PARAMÈTRE ?gerant= DANS L'URL
+// ═══════════════════════════════════════════════════════
+const GERANT_FILTRE = new URLSearchParams(window.location.search).get('gerant') || '';
+
+// ═══════════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════
-let DATA = [];
+// ═══════════════════════════════════════════════════════
+let DATA         = [];
 let activeFilter = 'all';
-let sortKey = null;
-let sortAsc  = true;
-const FLAGS  = {US:'🇺🇸', FR:'🇫🇷', GB:'🇬🇧', DK:'🇩🇰', DE:'🇩🇪', NL:'🇳🇱', CH:'🇨🇭', JP:'🇯🇵'};
+let sortKey      = null;
+let sortAsc      = true;
+const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'🇩🇪',NL:'🇳🇱',CH:'🇨🇭',JP:'🇯🇵'};
 
-// ═══════════════════════════════════
-//  TAB
-// ═══════════════════════════════════
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('sheetWrap').style.display = tab === 'sheet' ? 'flex' : 'none';
-  document.getElementById('csvWrap').style.display   = tab === 'csv'   ? 'flex' : 'none';
-}
+// ═══════════════════════════════════════════════════════
+//  INIT — charge au démarrage
+// ═══════════════════════════════════════════════════════
+(async function init() {
+  // Affiche le nom du gérant dans le header immédiatement
+  document.getElementById('managerName').textContent = GERANT_FILTRE || 'Portefeuille';
 
-// ═══════════════════════════════════
-//  GOOGLE SHEET
-// ═══════════════════════════════════
-async function loadSheet() {
-  const raw = document.getElementById('sheetUrl').value.trim();
-  if (!raw) { showErr('Collez l\'URL du Google Sheet.'); return; }
-  const m = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  if (!m) { showErr('URL invalide.'); return; }
-  const gid = (raw.match(/gid=(\d+)/) || [])[1] || '0';
-  const url = `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
-  setLoading();
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status} — vérifiez que le Sheet est public.`);
-    processCSV(await res.text(), 'Google Sheets');
-    document.getElementById('srcStatus').textContent = '✓ Connecté';
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+    const csv = await res.text();
+    processCSV(csv);
   } catch(e) {
-    showErr(e.message);
+    // Si le Sheet n'est pas encore configuré, on charge les données de démo
+    if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') {
+      loadDemoData();
+    } else {
+      showErr('Impossible de charger le Google Sheet : ' + e.message + ' — Vérifiez que le Sheet est partagé en accès public.');
+    }
   }
-}
 
-// ═══════════════════════════════════
-//  CSV FILE
-// ═══════════════════════════════════
-function loadCSV(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('csvName').textContent = file.name;
-  setLoading();
-  const reader = new FileReader();
-  reader.onload  = e => { processCSV(e.target.result, file.name); document.getElementById('srcStatus').textContent = '✓ ' + file.name; };
-  reader.onerror = () => showErr('Impossible de lire le fichier.');
-  reader.readAsText(file, 'UTF-8');
-}
+  // Rafraîchissement auto toutes les 5 minutes
+  setInterval(async () => {
+    if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') return;
+    try {
+      const res = await fetch(SHEET_URL + '&t=' + Date.now());
+      if (res.ok) { processCSV(await res.text()); }
+    } catch(e) {}
+  }, 5 * 60 * 1000);
+})();
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  CSV PARSER
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function parseCSV(text) {
   return text.trim().split(/\r?\n/).map(line => {
     const cells = []; let cur = '', q = false;
     for (const ch of line) {
       if (ch === '"') { q = !q; }
       else if (ch === ',' && !q) { cells.push(cur.trim()); cur = ''; }
-      else { cur += ch; }
+      else cur += ch;
     }
     cells.push(cur.trim());
     return cells;
   });
 }
 
-// ═══════════════════════════════════
-//  PROCESS — détecte colonnes auto
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  PROCESS CSV → DATA
+//  Colonnes du Sheet client :
+//  Valeur | Pays | Pays entier | Gérant | Achat-Emission | Achat-Cours
+//  Achat-Date | Vente-Emission | Vente-Cours | Vente-Date | Ticker
+//  Dernier cours | Perf. %
+// ═══════════════════════════════════════════════════════
 function processCSV(text, srcName) {
   hideErr();
   const rows = parseCSV(text);
   if (rows.length < 2) { showErr('Fichier vide.'); return; }
 
-  // Normalise les noms de colonnes
   const h = rows[0].map(c =>
-    c.toLowerCase()
-     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-     .replace(/[^a-z0-9]/g, '')
+    c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')
   );
 
   const col = (...names) => {
@@ -482,145 +268,176 @@ function processCSV(text, srcName) {
       const i = h.findIndex(c => c.includes(n));
       if (i >= 0) return i;
     }
-    return null;
+    return -1;
   };
 
-  // Mapping flexible — couvre les noms du fichier Excel client
   const idx = {
-    valeur:       col('valeur', 'nom', 'name', 'societe', 'company', 'libelle', 'titre'),
-    ticker:       col('ticker', 'code', 'symbole', 'isin'),
-    pays:         col('pays', 'country'),
-    gerant:       col('gerant', 'manager', 'gestionnaire'),
-    achatCours:   col('achatcours', 'achat-cours', 'prixachat', 'coursachat', 'achat'),
-    achatDate:    col('achatdate', 'achat-date', 'dateachat', 'dateda'),
-    venteCours:   col('ventecours', 'vente-cours', 'prixvente', 'coursvente'),
-    venteDate:    col('ventedate', 'vente-date', 'datevente'),
-    dernierCours: col('derniercours', 'dernier', 'last', 'prix', 'price', 'cours'),
-    perf:         col('perf', 'performance', 'rendement', 'ytd', 'variation'),
-    devise:       col('devise', 'currency', 'monnaie'),
+    valeur:       col('valeur','nom','libelle','societe'),
+    pays:         col('pays','country'),
+    gerant:       col('gerant','manager'),
+    achatCours:   col('achatcours','achat-cours','achatco'),
+    achatDate:    col('achatdate','achat-date','achatda'),
+    venteCours:   col('ventecours','vente-cours','venteco'),
+    venteDate:    col('ventedate','vente-date','venteda'),
+    ticker:       col('ticker','code','symbole'),
+    dernierCours: col('derniercours','dernier','last'),
+    perf:         col('perf','performance','rendement'),
+    devise:       col('devise','currency'),
   };
 
-  const str = (r, i) => (i !== null && r[i] != null) ? r[i].replace(/^"|"$/g, '').trim() : '';
-  const num = (r, i) => {
-    if (i === null || !r[i]) return null;
-    const v = parseFloat(str(r, i).replace(/[^0-9.,+\-]/g, '').replace(',', '.'));
+  const str = (r,i) => (i>=0 && r[i]!=null) ? String(r[i]).replace(/^"|"$/g,'').trim() : '';
+  const num = (r,i) => {
+    if (i<0 || !r[i]) return null;
+    const v = parseFloat(String(r[i]).replace(/[^0-9.,+\-]/g,'').replace(',','.'));
     return isNaN(v) ? null : v;
   };
 
-  DATA = rows.slice(1)
-    .filter(r => r.join('').trim())
-    .map(r => ({
-      valeur:       str(r, idx.valeur)       || str(r, idx.ticker) || '—',
-      ticker:       str(r, idx.ticker)       || '',
-      pays:         str(r, idx.pays)         || '',
-      gerant:       str(r, idx.gerant)       || '',
-      achatCours:   num(r, idx.achatCours),
-      achatDate:    str(r, idx.achatDate)    || '',
-      venteCours:   num(r, idx.venteCours),
-      venteDate:    str(r, idx.venteDate)    || '',
-      dernierCours: num(r, idx.dernierCours),
-      perf:         num(r, idx.perf),
-      devise:       str(r, idx.devise)       || '€',
-    }))
-    .filter(r => r.valeur && r.valeur !== '—');
+  let parsed = rows.slice(1)
+    .filter(r => r.join('').trim() && str(r, idx.valeur))
+    .map(r => {
+      const achatCours   = num(r, idx.achatCours);
+      const venteCours   = num(r, idx.venteCours);
+      const dernierCours = num(r, idx.dernierCours);
 
-  if (!DATA.length) { showErr('Aucune ligne valide. Vérifiez les en-têtes : ' + rows[0].join(', ')); return; }
+      // Calcul perf si pas déjà dans le Sheet
+      let perf = num(r, idx.perf);
+      if (perf == null) {
+        const ref  = venteCours || dernierCours;
+        if (ref && achatCours) perf = Math.round((ref - achatCours) / achatCours * 10000) / 100;
+      }
 
-  // Nom du gérant dans le header
-  const g = DATA.find(r => r.gerant)?.gerant || 'Portefeuille';
-  document.getElementById('managerName').textContent = g;
-  document.getElementById('footerSrc').textContent   = srcName;
+      // Devise depuis le ticker (ex: NASDAQ:AVAV → USD, EPA:AIR → EUR)
+      const ticker = str(r, idx.ticker);
+      let devise = str(r, idx.devise) || '';
+      if (!devise) {
+        if (/^(EPA|ETR|AMS|BIT|VTX|FRA):/.test(ticker)) devise = 'EUR';
+        else if (/^LON:/.test(ticker)) devise = 'GBX';
+        else if (/^CPH:/.test(ticker)) devise = 'DKK';
+        else devise = 'USD';
+      }
+
+      return {
+        valeur:       str(r, idx.valeur).split('(')[0].trim(),
+        ticker,
+        pays:         str(r, idx.pays),
+        gerant:       str(r, idx.gerant),
+        achatCours,
+        achatDate:    str(r, idx.achatDate),
+        venteCours,
+        venteDate:    str(r, idx.venteDate),
+        dernierCours,
+        perf,
+        devise,
+      };
+    });
+
+  // ── FILTRE PAR GÉRANT si paramètre URL présent ──
+  if (GERANT_FILTRE) {
+    parsed = parsed.filter(r =>
+      r.gerant.toLowerCase() === GERANT_FILTRE.toLowerCase()
+    );
+  }
+
+  if (!parsed.length) {
+    showErr(GERANT_FILTRE
+      ? `Aucune position trouvée pour le gérant "${GERANT_FILTRE}".`
+      : 'Aucune donnée valide dans le fichier.');
+    return;
+  }
+
+  DATA = parsed;
+
+  // Header
+  document.getElementById('managerName').textContent =
+    GERANT_FILTRE || DATA.find(r=>r.gerant)?.gerant || 'Portefeuille';
+
+  // Timestamp
+  const ts = new Date().toLocaleDateString('fr-FR') + ' ' +
+             new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('updateVal').textContent = ts;
 
   render();
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  DONNÉES DE DÉMO (fallback si SHEET_ID pas encore configuré)
+// ═══════════════════════════════════════════════════════
+function loadDemoData() {
+  const SHEET_URL = 'https://raw.githubusercontent.com/suceleste/CVATP_Tracker/main/data.csv';
+
+  processCSV(csv, 'Démo');
+}
+
+// ═══════════════════════════════════════════════════════
 //  RENDER
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function getRows() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let rows = [...DATA];
 
-  // Filter statut
   if (activeFilter === 'open')   rows = rows.filter(r => !r.venteDate);
   if (activeFilter === 'closed') rows = rows.filter(r =>  r.venteDate);
-  if (activeFilter === 'pos')    rows = rows.filter(r => (r.perf ?? calcPerf(r)) > 0);
-  if (activeFilter === 'neg')    rows = rows.filter(r => (r.perf ?? calcPerf(r)) < 0);
+  if (activeFilter === 'pos')    rows = rows.filter(r => (r.perf ?? 0) > 0);
+  if (activeFilter === 'neg')    rows = rows.filter(r => (r.perf ?? 0) < 0);
 
-  // Search
   if (q) rows = rows.filter(r =>
     r.valeur.toLowerCase().includes(q) ||
     r.ticker.toLowerCase().includes(q) ||
-    r.gerant.toLowerCase().includes(q) ||
     r.pays.toLowerCase().includes(q)
   );
 
-  // Sort
   if (sortKey) {
-    rows.sort((a, b) => {
-      let va = sortKey === 'perf' ? (a.perf ?? calcPerf(a) ?? -9999) : (a[sortKey] ?? '');
-      let vb = sortKey === 'perf' ? (b.perf ?? calcPerf(b) ?? -9999) : (b[sortKey] ?? '');
-      if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-      return sortAsc ? va - vb : vb - va;
+    rows.sort((a,b) => {
+      let va = a[sortKey] ?? (typeof a[sortKey]==='string' ? '' : -Infinity);
+      let vb = b[sortKey] ?? (typeof b[sortKey]==='string' ? '' : -Infinity);
+      if (typeof va === 'string') return sortAsc ? va.localeCompare(vb,'fr') : vb.localeCompare(va,'fr');
+      return sortAsc ? va-vb : vb-va;
     });
   }
   return rows;
 }
 
-function calcPerf(r) {
-  const ref  = r.venteCours || r.dernierCours;
-  const base = r.achatCours;
-  if (!ref || !base) return null;
-  return (ref - base) / base * 100;
-}
-
-function fmtNum(n, d = 2) {
-  if (n == null) return '—';
-  return n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
-}
-
 function render() {
-  const rows = getRows();
+  const rows  = getRows();
   const tbody = document.getElementById('tbody');
 
   document.getElementById('footerCount').textContent =
     rows.length + ' position' + (rows.length > 1 ? 's' : '');
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Aucune position correspondante.</td></tr>`;
+    tbody.innerHTML = `<tr class="state-row"><td colspan="9">Aucune position correspondante.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = rows.map((r, i) => {
-    const p    = r.perf ?? calcPerf(r);
     const open = !r.venteDate;
     const flag = FLAGS[r.pays] || '';
+    const p    = r.perf;
 
     const perfHTML = p != null
-      ? `<span class="perf-badge ${p > 0 ? 'up' : p < 0 ? 'down' : 'flat'}">${p >= 0 ? '▲' : '▼'} ${fmtNum(Math.abs(p))} %</span>`
+      ? `<span class="perf-badge ${p>0?'up':p<0?'down':'flat'}">${p>=0?'▲':'▼'} ${fmt(Math.abs(p))} %</span>`
       : '<span style="color:var(--text-muted)">—</span>';
 
-    return `<tr class="${open ? '' : 'closed'}" style="animation-delay:${i * 15}ms">
+    return `<tr class="${open?'':'closed'}" style="animation-delay:${i*14}ms">
       <td>
-        <div class="val-name">${flag} ${esc(r.valeur.split('(')[0].trim())}</div>
+        <div class="val-name">${flag} ${esc(r.valeur)}</div>
         ${r.ticker ? `<div class="val-ticker">${esc(r.ticker)}</div>` : ''}
       </td>
-      <td>${flag} ${esc(r.pays)}</td>
-      <td>${r.gerant ? `<span class="gerant-badge">${esc(r.gerant)}</span>` : '—'}</td>
-      <td class="r">${r.achatCours != null ? `<span class="price-val">${fmtNum(r.achatCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
-      <td class="r date-val">${esc(r.achatDate) || '—'}</td>
-      <td class="r">${r.venteCours != null ? `<span class="price-val">${fmtNum(r.venteCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
-      <td class="r date-val">${esc(r.venteDate) || '—'}</td>
-      <td class="r">${r.dernierCours != null ? `<span class="price-val">${fmtNum(r.dernierCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
+      <td><span class="flag">${flag}</span>${esc(r.pays)}</td>
+      <td class="r">${r.achatCours!=null ? `<span class="price-val">${fmt(r.achatCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
+      <td class="r date-val">${esc(r.achatDate)||'—'}</td>
+      <td class="r">${r.venteCours!=null ? `<span class="price-val">${fmt(r.venteCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
+      <td class="r date-val">${esc(r.venteDate)||'—'}</td>
+      <td class="r">${r.dernierCours!=null ? `<span class="price-val">${fmt(r.dernierCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
       <td class="r">${perfHTML}</td>
-      <td><span class="status-pill ${open ? 'open' : 'closed'}">${open ? '● Ouverte' : 'Clôturée'}</span></td>
+      <td><span class="status-pill ${open?'open':'closed'}">${open?'● Ouverte':'Clôturée'}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  CONTROLS
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function setFilter(f, btn) {
   activeFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -629,31 +446,28 @@ function setFilter(f, btn) {
 }
 
 function sort(key, th) {
-  sortAsc = sortKey === key ? !sortAsc : true;
-  sortKey = key;
+  sortAsc  = sortKey === key ? !sortAsc : true;
+  sortKey  = key;
   document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
   th.classList.add('sorted');
   render();
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════
+function fmt(n, d=2) {
+  if (n==null) return '—';
+  return n.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
-function setLoading() {
-  document.getElementById('tbody').innerHTML =
-    `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Chargement…</td></tr>`;
-}
-
 function showErr(msg) {
   const el = document.getElementById('errBox');
   el.textContent = '⚠ ' + msg;
   el.style.display = 'block';
 }
-
 function hideErr() {
   document.getElementById('errBox').style.display = 'none';
 }
