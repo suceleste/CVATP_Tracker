@@ -3,457 +3,198 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portefeuille — CVATP</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Portefeuille CVATP</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#09090b;--surface:#111114;--surface2:#17171b;
-    --border:#1f1f25;--border-light:#2a2a32;
-    --text:#e4e4e7;--text-muted:#52525b;--text-dim:#71717a;
-    --green:#22c55e;--green-bg:rgba(34,197,94,.08);
-    --red:#ef4444;--red-bg:rgba(239,68,68,.08);
-    --accent:#6366f1;--accent-glow:rgba(99,102,241,.12);
-  }
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);font-size:12.5px;line-height:1.5;}
-
-  /* HEADER */
-  .header{
-    padding:16px 22px 12px;border-bottom:1px solid var(--border);
-    display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
-    background:linear-gradient(180deg,#0d1015 0%,var(--bg) 100%);
-  }
-  .manager-tag{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;}
-  .manager-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
-  .header-right{display:flex;align-items:center;gap:14px;}
-  .update-info{text-align:right;font-size:10px;color:var(--text-muted);line-height:1.7;}
-  .update-info strong{color:var(--text-dim);}
-  .live-badge{display:flex;align-items:center;gap:5px;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);}
-  .live-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-
-  /* TOOLBAR */
-  .toolbar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:8px 18px;border-bottom:1px solid var(--border);
-    background:var(--surface);gap:8px;flex-wrap:wrap;
-  }
-  .search-wrap{position:relative;}
-  .search-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
-  .search-input{
-    background:var(--bg);border:1px solid var(--border-light);border-radius:4px;
-    padding:5px 10px 5px 26px;color:var(--text);font-family:'DM Mono',monospace;
-    font-size:11px;width:200px;outline:none;transition:border-color .2s;
-  }
-  .search-input:focus{border-color:var(--accent);}
-  .search-input::placeholder{color:var(--text-muted);}
-  .filter-group{display:flex;gap:4px;flex-wrap:wrap;}
-  .filter-btn{
-    padding:4px 10px;border-radius:4px;border:1px solid var(--border-light);
-    background:transparent;color:var(--text-dim);font-family:'DM Mono',monospace;
-    font-size:10px;cursor:pointer;transition:all .15s;
-  }
-  .filter-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .filter-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent);}
-
-  /* TABLE */
-  .table-wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;min-width:820px;}
-  thead tr{border-bottom:1px solid var(--border-light);}
-  th{
-    padding:9px 13px;font-size:9.5px;font-weight:500;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--text-muted);text-align:left;
-    white-space:nowrap;cursor:pointer;user-select:none;
-    position:sticky;top:0;background:var(--surface);z-index:1;transition:color .15s;
-  }
-  th:hover{color:var(--text-dim);}
-  th.sorted{color:var(--accent);}
-  th.r,td.r{text-align:right;}
-  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;animation:fadeRow .2s ease both;opacity:0;}
-  tbody tr:hover{background:var(--surface2);}
-  tbody tr.closed{opacity:.48;}
-  tbody tr.closed:hover{opacity:.72;background:var(--surface2);}
-  @keyframes fadeRow{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-  td{padding:10px 13px;font-size:12px;white-space:nowrap;}
-
-  .val-name{font-weight:500;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;}
-  .val-ticker{font-size:10px;color:var(--text-muted);margin-top:1px;letter-spacing:.05em;}
-  .flag{margin-right:3px;}
-  .price-val{font-weight:500;}
-  .price-cur{font-size:10px;color:var(--text-muted);margin-left:2px;}
-  .date-val{color:var(--text-dim);font-size:11px;}
-
-  .perf-badge{
-    display:inline-flex;align-items:center;gap:3px;
-    padding:3px 8px;border-radius:3px;font-size:11.5px;font-weight:500;
-  }
-  .perf-badge.up  {background:var(--green-bg);color:var(--green);}
-  .perf-badge.down{background:var(--red-bg);  color:var(--red);}
-  .perf-badge.flat{background:var(--surface2);color:var(--text-dim);}
-
-  .status-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;}
-  .status-pill.open  {background:var(--green-bg);color:var(--green);}
-  .status-pill.closed{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border-light);}
-
-  /* FOOTER */
-  .footer{
-    padding:9px 18px;border-top:1px solid var(--border);
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:10px;color:var(--text-muted);flex-wrap:wrap;gap:8px;
-    background:var(--surface);
-  }
-
-  /* STATES */
-  .state-row td{text-align:center;padding:48px 20px;color:var(--text-muted);}
-  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .err-box{margin:10px 18px;padding:10px 14px;border-radius:4px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:var(--red);font-size:11px;display:none;}
+:root{--bg:#09090b;--sur:#111114;--sur2:#17171b;--bdr:#1f1f25;--bdrl:#2a2a32;--tx:#e4e4e7;--txm:#52525b;--txd:#71717a;--g:#22c55e;--gbg:rgba(34,197,94,.08);--r:#ef4444;--rbg:rgba(239,68,68,.08);--ac:#6366f1;--acg:rgba(99,102,241,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--tx);font-size:12.5px}
+.hd{padding:14px 20px;border-bottom:1px solid var(--bdr);background:var(--sur)}
+.hd-tag{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--txm);margin-bottom:2px}
+.hd-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx)}
+.tb{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--bdr);background:var(--sur);gap:8px;flex-wrap:wrap}
+.si{position:relative}
+.si svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--txm);pointer-events:none}
+.si input{background:var(--bg);border:1px solid var(--bdrl);border-radius:4px;padding:5px 10px 5px 26px;color:var(--tx);font-family:'DM Mono',monospace;font-size:11px;width:190px;outline:none}
+.si input:focus{border-color:var(--ac)}
+.si input::placeholder{color:var(--txm)}
+.fg{display:flex;gap:4px;flex-wrap:wrap}
+.fb{padding:4px 10px;border-radius:4px;border:1px solid var(--bdrl);background:transparent;color:var(--txd);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all .15s}
+.fb:hover{border-color:var(--ac);color:var(--ac)}
+.fb.on{background:var(--acg);border-color:var(--ac);color:var(--ac)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+thead tr{border-bottom:1px solid var(--bdrl)}
+th{padding:9px 12px;font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--txm);text-align:left;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--sur);z-index:1;transition:color .15s}
+th:hover{color:var(--txd)}
+th.on{color:var(--ac)}
+.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s;animation:fr .2s ease both}
+tbody tr:hover{background:var(--sur2)}
+tbody tr.cl{opacity:.45}
+tbody tr.cl:hover{opacity:.7;background:var(--sur2)}
+@keyframes fr{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+td{padding:10px 12px;font-size:12px;white-space:nowrap}
+.vn{font-weight:500;max-width:210px;overflow:hidden;text-overflow:ellipsis}
+.vt{font-size:10px;color:var(--txm);margin-top:1px}
+.pc{font-weight:500}
+.cu{font-size:10px;color:var(--txm);margin-left:2px}
+.dv{color:var(--txd);font-size:11px}
+.pb{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:3px;font-size:11.5px;font-weight:500}
+.pb.up{background:var(--gbg);color:var(--g)}
+.pb.dn{background:var(--rbg);color:var(--r)}
+.pb.fl{background:var(--sur2);color:var(--txd)}
+.sp{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px}
+.sp.op{background:var(--gbg);color:var(--g)}
+.sp.cl2{background:var(--sur2);color:var(--txd);border:1px solid var(--bdrl)}
+.ft{padding:8px 16px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;font-size:10px;color:var(--txm);background:var(--sur)}
+.em{text-align:center;padding:40px;color:var(--txm);font-size:12px}
+.err{margin:10px 16px;padding:10px 14px;border-radius:4px;background:var(--rbg);border:1px solid rgba(239,68,68,.22);color:var(--r);font-size:11px;display:none}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div>
-    <div class="manager-tag">Portefeuille · CVATP</div>
-    <div class="manager-name" id="managerName">Chargement…</div>
-  </div>
-  <div hidden class="header-right">
-    <div class="update-info">
-      <div>Dernière mise à jour</div>
-      <strong id="updateVal">—</strong>
-    </div>
-    <div class="live-badge"><span class="live-dot"></span>Temps réel</div>
-  </div>
+<div class="hd">
+  <div class="hd-tag">Portefeuille · CVATP</div>
+  <div class="hd-name" id="hdName">Chargement…</div>
 </div>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="search-wrap">
+<div class="tb">
+  <div class="si">
     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input class="search-input" id="searchInput" placeholder="Rechercher…" oninput="render()">
+    <input id="q" placeholder="Rechercher…" oninput="render()">
   </div>
-  <div class="filter-group">
-    <button class="filter-btn active" onclick="setFilter('all',this)">Toutes</button>
-    <button class="filter-btn" onclick="setFilter('open',this)">Ouvertes</button>
-    <button class="filter-btn" onclick="setFilter('closed',this)">Clôturées</button>
-    <button class="filter-btn" onclick="setFilter('pos',this)">▲ Positives</button>
-    <button class="filter-btn" onclick="setFilter('neg',this)">▼ Négatives</button>
+  <div class="fg">
+    <button class="fb on" onclick="fil('all',this)">Toutes</button>
+    <button class="fb" onclick="fil('open',this)">Ouvertes</button>
+    <button class="fb" onclick="fil('closed',this)">Clôturées</button>
+    <button class="fb" onclick="fil('pos',this)">▲ Positives</button>
+    <button class="fb" onclick="fil('neg',this)">▼ Négatives</button>
   </div>
 </div>
 
-<!-- ERROR -->
-<div class="err-box" id="errBox"></div>
+<div class="err" id="err"></div>
 
-<!-- TABLE -->
-<div class="table-wrap">
+<div class="tw">
   <table>
-    <thead>
-      <tr>
-        <th onclick="sort('valeur',this)">Valeur</th>
-        <th onclick="sort('pays',this)">Pays</th>
-        <th class="r" onclick="sort('achatCours',this)">Achat</th>
-        <th class="r" onclick="sort('achatDate',this)">Date achat</th>
-        <th class="r" onclick="sort('venteCours',this)">Vente</th>
-        <th class="r" onclick="sort('venteDate',this)">Date vente</th>
-        <th class="r" onclick="sort('dernierCours',this)">Dernier cours</th>
-        <th class="r" onclick="sort('perf',this)">Perf. %</th>
-        <th>Statut</th>
-      </tr>
-    </thead>
-    <tbody id="tbody">
-      <tr class="state-row"><td colspan="9"><span class="spinner"></span>Chargement des données…</td></tr>
-    </tbody>
+    <thead><tr>
+      <th onclick="srt('valeur',this)">Valeur</th>
+      <th onclick="srt('pays',this)">Pays</th>
+      <th class="r" onclick="srt('achatCours',this)">Achat</th>
+      <th class="r" onclick="srt('achatDate',this)">Date achat</th>
+      <th class="r" onclick="srt('venteCours',this)">Vente</th>
+      <th class="r" onclick="srt('venteDate',this)">Date vente</th>
+      <th class="r" onclick="srt('dernierCours',this)">Dernier cours</th>
+      <th class="r" onclick="srt('perf',this)">Perf. %</th>
+      <th>Statut</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
   </table>
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-  <span>Cotation Google Finance · Source Google Sheets</span>
-  <span id="footerCount"></span>
+<div class="ft">
+  <span>Cotation Google Finance · CVATP</span>
+  <span id="cnt"></span>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  CONFIG — À MODIFIER
-//  1. Remplacer SHEET_ID par l'ID du Google Sheet du client
-//  2. Le Sheet doit être partagé "Tout le monde peut voir"
-//  3. Dans Google Sites, intégrer via :
-//     https://suceleste.github.io/CVATP_Tracker?gerant=Alain+Pitous
-// ═══════════════════════════════════════════════════════
-const SHEET_ID   = 'VOTRE_SHEET_ID_ICI';
-const SHEET_NAME = 'Au cours du jour';
-const SHEET_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+// ── URL du CSV dans le repo GitHub ──────────────────────────────────
+const CSV_URL = 'https://raw.githubusercontent.com/suceleste/CVATP_Tracker/main/portefeuille-alain-pitous.csv';
 
-// ═══════════════════════════════════════════════════════
-//  LIRE LE PARAMÈTRE ?gerant= DANS L'URL
-// ═══════════════════════════════════════════════════════
-const GERANT_FILTRE = new URLSearchParams(window.location.search).get('gerant') || '';
+// ── Filtre gérant via ?gerant=Alain+Pitous dans l'URL de l'iframe ───
+const GERANT = new URLSearchParams(location.search).get('gerant') || '';
 
-// ═══════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════
-let DATA         = [];
-let activeFilter = 'all';
-let sortKey      = null;
-let sortAsc      = true;
-const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'🇩🇪',NL:'🇳🇱',CH:'🇨🇭',JP:'🇯🇵'};
+const FLAGS = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'🇩🇪'};
+let DATA=[], filt='all', sk=null, sa=true;
 
-// ═══════════════════════════════════════════════════════
-//  INIT — charge au démarrage
-// ═══════════════════════════════════════════════════════
-(async function init() {
-  // Affiche le nom du gérant dans le header immédiatement
-  document.getElementById('managerName').textContent = GERANT_FILTRE || 'Portefeuille';
+// ── CHARGEMENT ───────────────────────────────────────────────────────
+fetch(CSV_URL)
+  .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+  .then(csv => {
+    const rows = csv.trim().split('\n').map(l => l.split(',').map(c => c.trim()));
+    const h    = rows[0].map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''));
+    const ci   = (...ns) => { for(const n of ns){ const i=h.findIndex(c=>c.includes(n)); if(i>=0)return i; } return -1; };
 
+    const I = {
+      valeur: ci('valeur','nom','libelle'),
+      pays:   ci('pays'),
+      gerant: ci('gerant','manager'),
+      ac:     ci('achatcours'),
+      ad:     ci('achatdate'),
+      vc:     ci('ventecours'),
+      vd:     ci('ventedate'),
+      ticker: ci('ticker'),
+      dc:     ci('derniercours','dernier'),
+      perf:   ci('perf'),
+      devise: ci('devise','currency'),
+    };
 
-  
-  loadDemoData();
- 
-  
-})();
+    const s = (r,i) => i>=0 && r[i] ? r[i].replace(/^"|"$/g,'').trim() : '';
+    const n = (r,i) => { if(i<0||!r[i]) return null; const v=parseFloat(r[i].replace(',','.')); return isNaN(v)?null:v; };
 
-// ═══════════════════════════════════════════════════════
-//  CSV PARSER
-// ═══════════════════════════════════════════════════════
-function parseCSV(text) {
-  return text.trim().split(/\r?\n/).map(line => {
-    const cells = []; let cur = '', q = false;
-    for (const ch of line) {
-      if (ch === '"') { q = !q; }
-      else if (ch === ',' && !q) { cells.push(cur.trim()); cur = ''; }
-      else cur += ch;
-    }
-    cells.push(cur.trim());
-    return cells;
+    let parsed = rows.slice(1).filter(r=>r.join('').trim() && s(r,I.valeur)).map(r => {
+      const ac=n(r,I.ac), vc=n(r,I.vc), dc=n(r,I.dc);
+      let perf=n(r,I.perf);
+      if(perf==null){ const ref=vc||dc; if(ref&&ac) perf=Math.round((ref-ac)/ac*10000)/100; }
+      const ticker=s(r,I.ticker);
+      let devise=s(r,I.devise);
+      if(!devise){ if(/^(EPA|ETR|AMS):/.test(ticker)) devise='EUR'; else if(/^LON:/.test(ticker)) devise='GBX'; else if(/^CPH:/.test(ticker)) devise='DKK'; else devise='USD'; }
+      return { valeur:s(r,I.valeur).split('(')[0].trim(), ticker, pays:s(r,I.pays), gerant:s(r,I.gerant), achatCours:ac, achatDate:s(r,I.ad), venteCours:vc, venteDate:s(r,I.vd), dernierCours:dc, perf, devise };
+    });
+
+    if(GERANT) parsed = parsed.filter(r => r.gerant.toLowerCase()===GERANT.toLowerCase());
+    if(!parsed.length){ showErr(GERANT ? `Aucune position pour "${GERANT}".` : 'Fichier vide.'); return; }
+
+    DATA = parsed;
+    document.getElementById('hdName').textContent = GERANT || (parsed.find(r=>r.gerant)?.gerant) || 'Portefeuille';
+    render();
+  })
+  .catch(e => showErr('Impossible de charger le CSV : ' + e.message));
+
+// ── RENDER ───────────────────────────────────────────────────────────
+function getRows(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  let r=[...DATA];
+  if(filt==='open')   r=r.filter(x=>!x.venteDate);
+  if(filt==='closed') r=r.filter(x=> x.venteDate);
+  if(filt==='pos')    r=r.filter(x=>(x.perf??0)>0);
+  if(filt==='neg')    r=r.filter(x=>(x.perf??0)<0);
+  if(q) r=r.filter(x=>x.valeur.toLowerCase().includes(q)||x.ticker.toLowerCase().includes(q)||x.pays.toLowerCase().includes(q));
+  if(sk) r.sort((a,b)=>{
+    let va=a[sk]??-Infinity, vb=b[sk]??-Infinity;
+    if(typeof va==='string')return sa?va.localeCompare(vb,'fr'):vb.localeCompare(va,'fr');
+    return sa?va-vb:vb-va;
   });
+  return r;
 }
 
-// ═══════════════════════════════════════════════════════
-//  PROCESS CSV → DATA
-//  Colonnes du Sheet client :
-//  Valeur | Pays | Pays entier | Gérant | Achat-Emission | Achat-Cours
-//  Achat-Date | Vente-Emission | Vente-Cours | Vente-Date | Ticker
-//  Dernier cours | Perf. %
-// ═══════════════════════════════════════════════════════
-function processCSV(text, srcName) {
-  hideErr();
-  const rows = parseCSV(text);
-  if (rows.length < 2) { showErr('Fichier vide.'); return; }
-
-  const h = rows[0].map(c =>
-    c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')
-  );
-
-  const col = (...names) => {
-    for (const n of names) {
-      const i = h.findIndex(c => c.includes(n));
-      if (i >= 0) return i;
-    }
-    return -1;
-  };
-
-  const idx = {
-    valeur:       col('valeur','nom','libelle','societe'),
-    pays:         col('pays','country'),
-    gerant:       col('gerant','manager'),
-    achatCours:   col('achatcours','achat-cours','achatco'),
-    achatDate:    col('achatdate','achat-date','achatda'),
-    venteCours:   col('ventecours','vente-cours','venteco'),
-    venteDate:    col('ventedate','vente-date','venteda'),
-    ticker:       col('ticker','code','symbole'),
-    dernierCours: col('derniercours','dernier','last'),
-    perf:         col('perf','performance','rendement'),
-    devise:       col('devise','currency'),
-  };
-
-  const str = (r,i) => (i>=0 && r[i]!=null) ? String(r[i]).replace(/^"|"$/g,'').trim() : '';
-  const num = (r,i) => {
-    if (i<0 || !r[i]) return null;
-    const v = parseFloat(String(r[i]).replace(/[^0-9.,+\-]/g,'').replace(',','.'));
-    return isNaN(v) ? null : v;
-  };
-
-  let parsed = rows.slice(1)
-    .filter(r => r.join('').trim() && str(r, idx.valeur))
-    .map(r => {
-      const achatCours   = num(r, idx.achatCours);
-      const venteCours   = num(r, idx.venteCours);
-      const dernierCours = num(r, idx.dernierCours);
-
-      // Calcul perf si pas déjà dans le Sheet
-      let perf = num(r, idx.perf);
-      if (perf == null) {
-        const ref  = venteCours || dernierCours;
-        if (ref && achatCours) perf = Math.round((ref - achatCours) / achatCours * 10000) / 100;
-      }
-
-      // Devise depuis le ticker (ex: NASDAQ:AVAV → USD, EPA:AIR → EUR)
-      const ticker = str(r, idx.ticker);
-      let devise = str(r, idx.devise) || '';
-      if (!devise) {
-        if (/^(EPA|ETR|AMS|BIT|VTX|FRA):/.test(ticker)) devise = 'EUR';
-        else if (/^LON:/.test(ticker)) devise = 'GBX';
-        else if (/^CPH:/.test(ticker)) devise = 'DKK';
-        else devise = 'USD';
-      }
-
-      return {
-        valeur:       str(r, idx.valeur).split('(')[0].trim(),
-        ticker,
-        pays:         str(r, idx.pays),
-        gerant:       str(r, idx.gerant),
-        achatCours,
-        achatDate:    str(r, idx.achatDate),
-        venteCours,
-        venteDate:    str(r, idx.venteDate),
-        dernierCours,
-        perf,
-        devise,
-      };
-    });
-
-  // ── FILTRE PAR GÉRANT si paramètre URL présent ──
-  if (GERANT_FILTRE) {
-    parsed = parsed.filter(r =>
-      r.gerant.toLowerCase() === GERANT_FILTRE.toLowerCase()
-    );
-  }
-
-  if (!parsed.length) {
-    showErr(GERANT_FILTRE
-      ? `Aucune position trouvée pour le gérant "${GERANT_FILTRE}".`
-      : 'Aucune donnée valide dans le fichier.');
-    return;
-  }
-
-  DATA = parsed;
-
-  // Header
-  document.getElementById('managerName').textContent =
-    GERANT_FILTRE || DATA.find(r=>r.gerant)?.gerant || 'Portefeuille';
-
-  // Timestamp
-  const ts = new Date().toLocaleDateString('fr-FR') + ' ' +
-             new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-  document.getElementById('updateVal').textContent = ts;
-
-  render();
-}
-
-// ═══════════════════════════════════════════════════════
-//  DONNÉES DE DÉMO (fallback si SHEET_ID pas encore configuré)
-// ═══════════════════════════════════════════════════════
-function loadDemoData() {
-  const csv = 'https://raw.githubusercontent.com/suceleste/CVATP_Tracker/main/data.csv';
-
-  processCSV(csv, 'Démo');
-}
-
-// ═══════════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════════
-function getRows() {
-  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  let rows = [...DATA];
-
-  if (activeFilter === 'open')   rows = rows.filter(r => !r.venteDate);
-  if (activeFilter === 'closed') rows = rows.filter(r =>  r.venteDate);
-  if (activeFilter === 'pos')    rows = rows.filter(r => (r.perf ?? 0) > 0);
-  if (activeFilter === 'neg')    rows = rows.filter(r => (r.perf ?? 0) < 0);
-
-  if (q) rows = rows.filter(r =>
-    r.valeur.toLowerCase().includes(q) ||
-    r.ticker.toLowerCase().includes(q) ||
-    r.pays.toLowerCase().includes(q)
-  );
-
-  if (sortKey) {
-    rows.sort((a,b) => {
-      let va = a[sortKey] ?? (typeof a[sortKey]==='string' ? '' : -Infinity);
-      let vb = b[sortKey] ?? (typeof b[sortKey]==='string' ? '' : -Infinity);
-      if (typeof va === 'string') return sortAsc ? va.localeCompare(vb,'fr') : vb.localeCompare(va,'fr');
-      return sortAsc ? va-vb : vb-va;
-    });
-  }
-  return rows;
-}
-
-function render() {
-  const rows  = getRows();
-  const tbody = document.getElementById('tbody');
-
-  document.getElementById('footerCount').textContent =
-    rows.length + ' position' + (rows.length > 1 ? 's' : '');
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr class="state-row"><td colspan="9">Aucune position correspondante.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = rows.map((r, i) => {
-    const open = !r.venteDate;
-    const flag = FLAGS[r.pays] || '';
-    const p    = r.perf;
-
-    const perfHTML = p != null
-      ? `<span class="perf-badge ${p>0?'up':p<0?'down':'flat'}">${p>=0?'▲':'▼'} ${fmt(Math.abs(p))} %</span>`
-      : '<span style="color:var(--text-muted)">—</span>';
-
-    return `<tr class="${open?'':'closed'}" style="animation-delay:${i*14}ms">
-      <td>
-        <div class="val-name">${flag} ${esc(r.valeur)}</div>
-        ${r.ticker ? `<div class="val-ticker">${esc(r.ticker)}</div>` : ''}
-      </td>
-      <td><span class="flag">${flag}</span>${esc(r.pays)}</td>
-      <td class="r">${r.achatCours!=null ? `<span class="price-val">${fmt(r.achatCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
-      <td class="r date-val">${esc(r.achatDate)||'—'}</td>
-      <td class="r">${r.venteCours!=null ? `<span class="price-val">${fmt(r.venteCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
-      <td class="r date-val">${esc(r.venteDate)||'—'}</td>
-      <td class="r">${r.dernierCours!=null ? `<span class="price-val">${fmt(r.dernierCours)}</span><span class="price-cur">${r.devise}</span>` : '—'}</td>
-      <td class="r">${perfHTML}</td>
-      <td><span class="status-pill ${open?'open':'closed'}">${open?'● Ouverte':'Clôturée'}</span></td>
+function render(){
+  const list=getRows();
+  document.getElementById('cnt').textContent=list.length+' position'+(list.length>1?'s':'');
+  if(!list.length){ document.getElementById('tbody').innerHTML=`<tr><td colspan="9" class="em">Aucune position.</td></tr>`; return; }
+  document.getElementById('tbody').innerHTML=list.map((r,i)=>{
+    const open=!r.venteDate, fl=FLAGS[r.pays]||'', p=r.perf;
+    const ph=p!=null?`<span class="pb ${p>0?'up':p<0?'dn':'fl'}">${p>=0?'▲':'▼'} ${fm(Math.abs(p))} %</span>`:'<span style="color:var(--txm)">—</span>';
+    const pr=v=>v!=null?`<span class="pc">${fm(v)}</span>`:'—';
+    return `<tr class="${open?'':'cl'}" style="animation-delay:${i*10}ms">
+      <td><div class="vn">${fl} ${e(r.valeur)}</div><div class="vt">${e(r.ticker)}</div></td>
+      <td>${fl} ${e(r.pays)}</td>
+      <td class="r">${r.achatCours!=null?`${pr(r.achatCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
+      <td class="r dv">${e(r.achatDate)||'—'}</td>
+      <td class="r">${r.venteCours!=null?`${pr(r.venteCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
+      <td class="r dv">${e(r.venteDate)||'—'}</td>
+      <td class="r">${r.dernierCours!=null?`${pr(r.dernierCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
+      <td class="r">${ph}</td>
+      <td><span class="sp ${open?'op':'cl2'}">${open?'● Ouverte':'Clôturée'}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-//  CONTROLS
-// ═══════════════════════════════════════════════════════
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
-
-function sort(key, th) {
-  sortAsc  = sortKey === key ? !sortAsc : true;
-  sortKey  = key;
-  document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
-  th.classList.add('sorted');
-  render();
-}
-
-// ═══════════════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════════════
-function fmt(n, d=2) {
-  if (n==null) return '—';
-  return n.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
-}
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function showErr(msg) {
-  const el = document.getElementById('errBox');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
-}
-function hideErr() {
-  document.getElementById('errBox').style.display = 'none';
-}
+function fil(f,btn){filt=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');render();}
+function srt(k,th){sa=sk===k?!sa:true;sk=k;document.querySelectorAll('th').forEach(t=>t.classList.remove('on'));th.classList.add('on');render();}
+function fm(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showErr(m){const el=document.getElementById('err');el.textContent='⚠ '+m;el.style.display='block';document.getElementById('hdName').textContent='Erreur';}
 </script>
 </body>
 </html>
