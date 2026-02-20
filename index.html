@@ -207,19 +207,13 @@ const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'
   // Affiche le nom du gérant dans le header immédiatement
   document.getElementById('managerName').textContent = GERANT_FILTRE || 'Portefeuille';
 
-  try {
-    const res = await fetch(SHEET_URL);
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-    const csv = await res.text();
-    processCSV(csv);
-  } catch(e) {
-    // Si le Sheet n'est pas encore configuré, on charge les données de démo
-    if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') {
-      loadDemoData();
-    } else {
-      showErr('Impossible de charger le Google Sheet : ' + e.message + ' — Vérifiez que le Sheet est partagé en accès public.');
-    }
+  
+  if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') {
+    loadDemoData();
+  } else {
+    showErr('Impossible de charger le Google Sheet : ' + e.message + ' — Vérifiez que le Sheet est partagé en accès public.');
   }
+  
 
   // Rafraîchissement auto toutes les 5 minutes
   setInterval(async () => {
