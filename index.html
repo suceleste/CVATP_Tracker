@@ -200,7 +200,7 @@ const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'
     return;
   }
 
-  /*try {
+  /try {
     const res = await fetch(SHEET_URL);
     if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
     processCSV(await res.text());
@@ -216,7 +216,7 @@ const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'
       if (res.ok) { processCSV(await res.text()); }
     } catch(e) {}
   }, 5 * 60 * 1000);
-})();*/
+})();
 
 // ═══════════════════════════════════════════════════════
 //  CSV PARSER
