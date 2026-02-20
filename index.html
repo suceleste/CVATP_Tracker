@@ -5,206 +5,327 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portefeuille — CVATP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#09090b; --surface:#111114; --surface2:#17171b;
-    --border:#1f1f25; --border-light:#2a2a32;
-    --text:#e4e4e7; --text-muted:#52525b; --text-dim:#71717a;
-    --green:#22c55e; --green-bg:rgba(34,197,94,.08);
-    --red:#ef4444; --red-bg:rgba(239,68,68,.08);
-    --accent:#6366f1; --accent-glow:rgba(99,102,241,.12);
-    --gold:#f59e0b;
+    --bg: #09090b;
+    --surface: #111114;
+    --surface2: #17171b;
+    --border: #1f1f25;
+    --border-light: #2a2a32;
+    --text: #e4e4e7;
+    --text-muted: #52525b;
+    --text-dim: #71717a;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,.08);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,.08);
+    --accent: #6366f1;
+    --accent-glow: rgba(99,102,241,.12);
   }
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;font-size:12.5px;line-height:1.5;}
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
 
-  /* ── SOURCE PANEL ── */
-  .source-panel{
-    background:var(--accent-glow);border-bottom:1px solid rgba(99,102,241,.25);
-    padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  /* ── SOURCE BAR ── */
+  .source-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
   }
-  .source-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);white-space:nowrap;}
-  .source-tabs{display:flex;gap:4px;}
-  .tab-btn{
-    padding:4px 12px;border-radius:4px;border:1px solid rgba(99,102,241,.3);
-    background:transparent;color:var(--text-dim);font-family:'DM Mono',monospace;
-    font-size:10.5px;cursor:pointer;transition:all .15s;
+  .source-label {
+    font-size: 9.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
-  .tab-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-  .source-input-wrap{flex:1;min-width:260px;display:flex;gap:8px;align-items:center;}
-  .source-input{
-    flex:1;background:rgba(0,0,0,.3);border:1px dashed rgba(99,102,241,.35);border-radius:4px;
-    color:var(--text);font-family:'DM Mono',monospace;font-size:11px;
-    padding:6px 10px;outline:none;transition:border-color .2s;
+  .tab-btn {
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    cursor: pointer;
+    transition: all .15s;
   }
-  .source-input:focus{border-color:var(--accent);border-style:solid;}
-  .source-input::placeholder{color:rgba(99,102,241,.4);}
-  .source-btn{
-    padding:6px 14px;border-radius:4px;border:none;background:var(--accent);
-    color:#fff;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;
-    white-space:nowrap;transition:opacity .15s;
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .source-input {
+    flex: 1;
+    min-width: 240px;
+    max-width: 460px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    outline: none;
+    transition: border-color .2s;
   }
-  .source-btn:hover{opacity:.85;}
-  .source-btn:disabled{opacity:.4;cursor:not-allowed;}
-  .file-label{
-    padding:6px 14px;border-radius:4px;border:1px solid rgba(99,102,241,.3);
-    color:var(--accent);font-size:11px;cursor:pointer;white-space:nowrap;transition:all .15s;
+  .source-input:focus { border-color: var(--accent); }
+  .source-input::placeholder { color: var(--text-muted); }
+  .load-btn {
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: opacity .15s;
+    white-space: nowrap;
   }
-  .file-label:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
-  #csvFileInput{display:none;}
-  .source-status{font-size:10px;color:var(--text-muted);font-style:italic;}
+  .load-btn:hover { opacity: .85; }
+  .file-label {
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .file-label:hover { border-color: var(--accent); color: var(--accent); }
+  #csvFileInput { display: none; }
+  .source-status { font-size: 10px; color: var(--text-muted); font-style: italic; }
 
   /* ── HEADER ── */
-  .header{
-    padding:22px 28px 16px;border-bottom:1px solid var(--border);
-    display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
-    background:linear-gradient(180deg,#0d1015 0%,var(--bg) 100%);
+  .header {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
   }
-  .manager-tag{font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;}
-  .manager-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
-  .header-right{display:flex;align-items:center;gap:14px;}
-  .last-update{text-align:right;font-size:10.5px;color:var(--text-muted);line-height:1.6;}
-  .last-update strong{color:var(--text-dim);}
-  .live-badge{
-    display:flex;align-items:center;gap:6px;
-    background:var(--green-bg);border:1px solid rgba(34,197,94,.2);border-radius:4px;
-    padding:5px 10px;font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--green);
+  .manager-tag {
+    font-size: 9.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
   }
-  .live-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-  /* ── STATS ── */
-  .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
-  .stat-cell{padding:14px 22px;border-right:1px solid var(--border);transition:background .15s;}
-  .stat-cell:last-child{border-right:none;}
-  .stat-cell:hover{background:var(--surface2);}
-  .stat-label{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-  .stat-value{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
-  .stat-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
-  .pos{color:var(--green);} .neg{color:var(--red);}
+  .manager-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--text);
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .live-dot {
+    width: 5px; height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
 
   /* ── TOOLBAR ── */
-  .toolbar{
-    padding:10px 20px;display:flex;align-items:center;justify-content:space-between;
-    border-bottom:1px solid var(--border);background:var(--surface);gap:10px;flex-wrap:wrap;
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    gap: 10px;
+    flex-wrap: wrap;
   }
-  .search-wrap{position:relative;flex:1;max-width:280px;}
-  .search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
-  .search-input{
-    width:100%;background:var(--bg);border:1px solid var(--border-light);border-radius:4px;
-    padding:6px 10px 6px 30px;color:var(--text);font-family:'DM Mono',monospace;font-size:11.5px;outline:none;transition:border-color .2s;
+  .search-wrap { position: relative; }
+  .search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+  .search-input {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 5px 10px 5px 28px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    width: 220px;
+    outline: none;
+    transition: border-color .2s;
   }
-  .search-input::placeholder{color:var(--text-muted);}
-  .search-input:focus{border-color:var(--accent);}
-  .sort-btn{
-    background:var(--bg);border:1px solid var(--border-light);border-radius:4px;
-    padding:5px 10px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10.5px;cursor:pointer;transition:all .15s;
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus { border-color: var(--accent); }
+  .filter-group { display: flex; gap: 5px; }
+  .filter-btn {
+    padding: 4px 11px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    cursor: pointer;
+    transition: all .15s;
   }
-  .sort-btn:hover{border-color:var(--accent);color:var(--text);}
-  .sort-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 
   /* ── TABLE ── */
-  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  table{width:100%;border-collapse:collapse;}
-  thead tr{border-bottom:1px solid var(--border-light);}
-  th{
-    padding:10px 16px;font-size:9.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--text-muted);text-align:left;background:var(--surface);cursor:pointer;
-    user-select:none;white-space:nowrap;transition:color .15s;position:sticky;top:0;z-index:1;
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; }
+  thead tr { border-bottom: 1px solid var(--border-light); background: var(--surface); }
+  th {
+    padding: 9px 14px;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color .15s;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
   }
-  th:hover{color:var(--text-dim);}
-  th.sort-asc::after{content:' ↑';color:var(--accent);}
-  th.sort-desc::after{content:' ↓';color:var(--accent);}
-  tbody tr{border-bottom:1px solid var(--border);transition:background .12s;animation:fadeRow .25s ease both;opacity:0;}
-  tbody tr:hover{background:var(--surface2);}
-  @keyframes fadeRow{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-  td{padding:11px 16px;font-size:12px;color:var(--text);white-space:nowrap;}
+  th:hover { color: var(--text-dim); }
+  th.sorted { color: var(--accent); }
+  th.r, td.r { text-align: right; }
 
-  .row-num{color:var(--text-muted);font-size:10px;text-align:center;}
-  .ticker-val{font-weight:500;color:var(--accent);letter-spacing:.05em;font-size:11.5px;}
-  .company-name{font-size:12px;color:var(--text);}
-  .company-sub{font-size:10px;color:var(--text-muted);margin-top:1px;}
-  .sector-badge{
-    display:inline-block;padding:2px 7px;border-radius:3px;font-size:9.5px;
-    background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+    animation: fadeRow .22s ease both;
+    opacity: 0;
   }
-  .price-cell{text-align:right;font-feature-settings:"tnum";}
-  .price-main{font-weight:500;font-size:12.5px;}
-  .price-currency{font-size:10px;color:var(--text-muted);margin-left:2px;}
-  .var-badge{
-    display:inline-flex;align-items:center;gap:3px;
-    padding:3px 8px;border-radius:3px;font-size:11px;font-weight:500;font-feature-settings:"tnum";
-  }
-  .var-badge.pos{background:var(--green-bg);color:var(--green);}
-  .var-badge.neg{background:var(--red-bg);color:var(--red);}
-  .var-badge.neutral{background:var(--surface2);color:var(--text-dim);}
-  .weight-bar-wrap{display:flex;align-items:center;justify-content:flex-end;gap:8px;}
-  .weight-bar{width:48px;height:3px;background:var(--border-light);border-radius:2px;overflow:hidden;flex-shrink:0;}
-  .weight-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .6s ease;}
-  .weight-num{font-size:11.5px;font-feature-settings:"tnum";min-width:38px;text-align:right;}
-  .signal{display:inline-block;padding:3px 8px;border-radius:3px;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
-  .signal.buy {background:rgba(34,197,94,.12); color:var(--green); border:1px solid rgba(34,197,94,.2);}
-  .signal.hold{background:rgba(245,158,11,.10);color:var(--gold);  border:1px solid rgba(245,158,11,.2);}
-  .signal.watch{background:rgba(99,102,241,.10);color:var(--accent);border:1px solid rgba(99,102,241,.2);}
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.closed { opacity: .48; }
+  tbody tr.closed:hover { opacity: .72; background: var(--surface2); }
+  @keyframes fadeRow { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
 
-  /* ── EMPTY / LOADING ── */
-  .state-row td{text-align:center;padding:48px;color:var(--text-muted);}
-  .spinner{display:inline-block;width:15px;height:15px;border:2px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .empty-icon{font-size:32px;margin-bottom:12px;display:block;}
-  .empty-msg{font-size:12px;line-height:1.8;}
-  .empty-msg strong{color:var(--text-dim);}
+  td { padding: 10px 14px; font-size: 12px; white-space: nowrap; }
 
-  /* ── ERROR ── */
-  .error-banner{
-    margin:12px 20px;padding:12px 16px;border-radius:5px;
-    background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);
-    color:var(--red);font-size:11.5px;display:none;
+  .val-name { font-weight: 500; color: var(--text); max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  .val-ticker { font-size: 10px; color: var(--text-muted); margin-top: 1px; letter-spacing: .05em; }
+
+  .flag { margin-right: 4px; }
+
+  .gerant-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(99,102,241,.18);
+    white-space: nowrap;
   }
+
+  .price-val { font-weight: 500; }
+  .price-cur { font-size: 10px; color: var(--text-muted); margin-left: 2px; }
+
+  .perf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .perf-badge.up   { background: var(--green-bg); color: var(--green); }
+  .perf-badge.down { background: var(--red-bg);   color: var(--red);   }
+  .perf-badge.flat { background: var(--surface2); color: var(--text-dim); }
+
+  .status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+  }
+  .status-pill.open   { background: var(--green-bg); color: var(--green); }
+  .status-pill.closed { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border-light); }
+
+  .date-val { color: var(--text-dim); font-size: 11px; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 52px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .icon { font-size: 28px; margin-bottom: 10px; }
+  .empty-state p { font-size: 12px; line-height: 1.8; }
+  .empty-state strong { color: var(--text-dim); }
 
   /* ── FOOTER ── */
-  .footer{
-    padding:12px 24px;border-top:1px solid var(--border);
-    display:flex;align-items:center;justify-content:space-between;
-    background:var(--surface);font-size:10px;color:var(--text-muted);gap:12px;flex-wrap:wrap;
+  .footer {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--surface);
   }
-  .footer-left{display:flex;align-items:center;gap:14px;}
-  .footer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px;}
 
-  @media(max-width:768px){
-    .stats-strip{grid-template-columns:repeat(2,1fr);}
-    .stat-cell:nth-child(2){border-right:none;}
-    .header{padding:16px;flex-wrap:wrap;}
+  /* ── ERROR ── */
+  .error-box {
+    margin: 10px 20px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    background: rgba(239,68,68,.08);
+    border: 1px solid rgba(239,68,68,.22);
+    color: var(--red);
+    font-size: 11.5px;
+    display: none;
   }
 </style>
 </head>
 <body>
 
-<!-- SOURCE PANEL -->
-<div class="source-panel">
+<!-- SOURCE BAR -->
+<div class="source-bar">
   <span class="source-label">Source</span>
-  <div class="source-tabs">
-    <button class="tab-btn active" onclick="switchTab('sheet',this)">Google Sheet</button>
-    <button class="tab-btn" onclick="switchTab('csv',this)">Fichier CSV</button>
+  <button class="tab-btn active" onclick="switchTab('sheet', this)">Google Sheet</button>
+  <button class="tab-btn" onclick="switchTab('csv', this)">Fichier CSV</button>
+
+  <div id="sheetWrap" style="display:flex;gap:8px;align-items:center;flex:1;">
+    <input class="source-input" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/VOTRE_ID/...">
+    <button class="load-btn" onclick="loadSheet()">Connecter</button>
   </div>
 
-  <!-- Google Sheet input -->
-  <div class="source-input-wrap" id="sheetInputWrap">
-    <input class="source-input" id="sheetUrl"
-      placeholder="https://docs.google.com/spreadsheets/d/VOTRE_ID/..." />
-    <button class="source-btn" onclick="loadSheet()">Connecter</button>
-  </div>
-
-  <!-- CSV file input -->
-  <div class="source-input-wrap" id="csvInputWrap" style="display:none;">
-    <label class="file-label" for="csvFileInput">📂 Choisir un fichier CSV</label>
+  <div id="csvWrap" style="display:none;gap:8px;align-items:center;">
+    <label class="file-label" for="csvFileInput">📂 Choisir un CSV</label>
     <input type="file" id="csvFileInput" accept=".csv" onchange="loadCSV(this)">
-    <span class="source-status" id="csvFileName">Aucun fichier sélectionné</span>
+    <span class="source-status" id="csvName">Aucun fichier</span>
   </div>
 
-  <span class="source-status" id="sourceStatus">Aucune donnée chargée</span>
+  <span class="source-status" id="srcStatus">Aucune donnée</span>
 </div>
 
 <!-- HEADER -->
@@ -213,36 +334,8 @@
     <div class="manager-tag">Portefeuille · CVATP</div>
     <div class="manager-name" id="managerName">—</div>
   </div>
-  <div class="header-right">
-    <div class="last-update">
-      <div>Dernière mise à jour</div>
-      <strong id="lastUpdateVal">—</strong>
-    </div>
-    <div class="live-badge"><span class="live-dot"></span>Temps réel</div>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats-strip">
-  <div class="stat-cell">
-    <div class="stat-label">Positions</div>
-    <div class="stat-value" id="statTotal">—</div>
-    <div class="stat-sub" id="statTotalSub">En attente de données</div>
-  </div>
-  <div class="stat-cell">
-    <div class="stat-label">Perf. moy. pondérée</div>
-    <div class="stat-value" id="statPerf">—</div>
-    <div class="stat-sub">YTD</div>
-  </div>
-  <div class="stat-cell">
-    <div class="stat-label">Lignes chargées</div>
-    <div class="stat-value" id="statLines">—</div>
-    <div class="stat-sub">depuis la source</div>
-  </div>
-  <div class="stat-cell">
-    <div class="stat-label">Meilleure perf.</div>
-    <div class="stat-value pos" id="statBest">—</div>
-    <div class="stat-sub" id="statBestName">—</div>
+  <div class="live-badge">
+    <span class="live-dot"></span> Temps réel
   </div>
 </div>
 
@@ -250,42 +343,42 @@
 <div class="toolbar">
   <div class="search-wrap">
     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" class="search-input" id="searchInput" placeholder="Rechercher ticker, société, secteur…" oninput="render()">
+    <input class="search-input" id="searchInput" placeholder="Rechercher…" oninput="render()">
   </div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;">
-    <button class="sort-btn" id="btn-ticker" onclick="sortBy('ticker')">Ticker</button>
-    <button class="sort-btn active" id="btn-weight" onclick="sortBy('weight')">Poids</button>
-    <button class="sort-btn" id="btn-perf" onclick="sortBy('perf')">Perf. YTD</button>
-    <button class="sort-btn" id="btn-var1d" onclick="sortBy('var1d')">Var. 1J</button>
-    <button class="sort-btn" id="btn-price" onclick="sortBy('price')">Cours</button>
+  <div class="filter-group">
+    <button class="filter-btn active" onclick="setFilter('all', this)">Toutes</button>
+    <button class="filter-btn" onclick="setFilter('open', this)">Ouvertes</button>
+    <button class="filter-btn" onclick="setFilter('closed', this)">Clôturées</button>
+    <button class="filter-btn" onclick="setFilter('pos', this)">▲ Positives</button>
+    <button class="filter-btn" onclick="setFilter('neg', this)">▼ Négatives</button>
   </div>
 </div>
 
 <!-- ERROR -->
-<div class="error-banner" id="errorBanner"></div>
+<div class="error-box" id="errBox"></div>
 
 <!-- TABLE -->
 <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th style="width:36px;text-align:center">#</th>
-        <th style="width:95px" onclick="sortBy('ticker')">Ticker</th>
-        <th onclick="sortBy('name')">Société</th>
-        <th style="width:140px">Secteur</th>
-        <th style="width:100px;text-align:right" onclick="sortBy('price')">Cours</th>
-        <th style="width:90px;text-align:right" onclick="sortBy('var1d')">Var. 1J</th>
-        <th style="width:100px;text-align:right" onclick="sortBy('perf')">Perf. YTD</th>
-        <th style="width:120px;text-align:right" onclick="sortBy('weight')">Poids</th>
-        <th style="width:100px;text-align:center">Signal</th>
+        <th onclick="sort('valeur', this)">Valeur</th>
+        <th onclick="sort('pays', this)">Pays</th>
+        <th onclick="sort('gerant', this)">Gérant</th>
+        <th class="r" onclick="sort('achatCours', this)">Achat</th>
+        <th class="r" onclick="sort('achatDate', this)">Date achat</th>
+        <th class="r" onclick="sort('venteCours', this)">Vente</th>
+        <th class="r" onclick="sort('venteDate', this)">Date vente</th>
+        <th class="r" onclick="sort('dernierCours', this)">Dernier cours</th>
+        <th class="r" onclick="sort('perf', this)">Perf. %</th>
+        <th>Statut</th>
       </tr>
     </thead>
-    <tbody id="tableBody">
-      <tr class="state-row"><td colspan="9">
-        <span class="empty-icon">📊</span>
-        <div class="empty-msg">
-          <strong>Aucune donnée chargée.</strong><br>
-          Collez l'URL de votre Google Sheet public ou importez un fichier CSV ci-dessus.
+    <tbody id="tbody">
+      <tr><td colspan="10">
+        <div class="empty-state">
+          <div class="icon">📊</div>
+          <p><strong>Aucune donnée chargée.</strong><br>Connectez un Google Sheet ou importez un fichier CSV.</p>
         </div>
       </td></tr>
     </tbody>
@@ -294,118 +387,95 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  <div class="footer-left">
-    <span><span class="footer-dot" style="background:var(--green)"></span>Cours : Google Finance / Tradingview</span>
-    <span><span class="footer-dot" style="background:var(--accent)"></span>Source : <span id="footerSource">—</span></span>
-  </div>
-  <div>CVATP · MAJ : <span id="footerDate">—</span></div>
+  <span>Cotation Google Finance · Source : <span id="footerSrc">—</span></span>
+  <span id="footerCount"></span>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════
-let data = [];
-let sortCol = 'weight';
-let sortAsc = false;
-let activeTab = 'sheet';
+// ═══════════════════════════════════
+let DATA = [];
+let activeFilter = 'all';
+let sortKey = null;
+let sortAsc  = true;
+const FLAGS  = {US:'🇺🇸', FR:'🇫🇷', GB:'🇬🇧', DK:'🇩🇰', DE:'🇩🇪', NL:'🇳🇱', CH:'🇨🇭', JP:'🇯🇵'};
 
-// ═══════════════════════════════════════════════
-//  TAB SWITCH
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
+//  TAB
+// ═══════════════════════════════════
 function switchTab(tab, btn) {
-  activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('sheetInputWrap').style.display = tab === 'sheet' ? 'flex' : 'none';
-  document.getElementById('csvInputWrap').style.display   = tab === 'csv'   ? 'flex' : 'none';
+  document.getElementById('sheetWrap').style.display = tab === 'sheet' ? 'flex' : 'none';
+  document.getElementById('csvWrap').style.display   = tab === 'csv'   ? 'flex' : 'none';
 }
 
-// ═══════════════════════════════════════════════
-//  GOOGLE SHEET LOADER
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
+//  GOOGLE SHEET
+// ═══════════════════════════════════
 async function loadSheet() {
   const raw = document.getElementById('sheetUrl').value.trim();
-  if (!raw) { showError('Collez l\'URL de votre Google Sheet.'); return; }
-
+  if (!raw) { showErr('Collez l\'URL du Google Sheet.'); return; }
   const m = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  if (!m) { showError('URL invalide. Format attendu : https://docs.google.com/spreadsheets/d/VOTRE_ID/...'); return; }
-
-  const id  = m[1];
+  if (!m) { showErr('URL invalide.'); return; }
   const gid = (raw.match(/gid=(\d+)/) || [])[1] || '0';
-  const url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
-
-  setLoading('Connexion au Google Sheet…');
-
+  const url = `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
+  setLoading();
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status} — vérifiez que le Sheet est partagé en accès public.`);
-    const csv = await res.text();
-    processCSV(csv, 'Google Sheet');
-    document.getElementById('sourceStatus').textContent = '✓ Sheet connecté';
-    document.getElementById('footerSource').textContent = 'Google Sheets';
+    if (!res.ok) throw new Error(`HTTP ${res.status} — vérifiez que le Sheet est public.`);
+    processCSV(await res.text(), 'Google Sheets');
+    document.getElementById('srcStatus').textContent = '✓ Connecté';
   } catch(e) {
-    showError(e.message + '\n\nAssurez-vous que le Sheet est partagé "Tout le monde avec le lien peut voir".');
-    clearTable();
+    showErr(e.message);
   }
 }
 
-// ═══════════════════════════════════════════════
-//  CSV FILE LOADER
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
+//  CSV FILE
+// ═══════════════════════════════════
 function loadCSV(input) {
   const file = input.files[0];
   if (!file) return;
-  document.getElementById('csvFileName').textContent = file.name;
-  setLoading('Lecture du fichier…');
+  document.getElementById('csvName').textContent = file.name;
+  setLoading();
   const reader = new FileReader();
-  reader.onload = e => {
-    processCSV(e.target.result, file.name);
-    document.getElementById('sourceStatus').textContent = '✓ Fichier chargé : ' + file.name;
-    document.getElementById('footerSource').textContent = file.name;
-  };
-  reader.onerror = () => showError('Impossible de lire le fichier.');
+  reader.onload  = e => { processCSV(e.target.result, file.name); document.getElementById('srcStatus').textContent = '✓ ' + file.name; };
+  reader.onerror = () => showErr('Impossible de lire le fichier.');
   reader.readAsText(file, 'UTF-8');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
 //  CSV PARSER
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
 function parseCSV(text) {
   return text.trim().split(/\r?\n/).map(line => {
     const cells = []; let cur = '', q = false;
-    for (let i = 0; i < line.length; i++) {
-      if (line[i] === '"') { q = !q; }
-      else if (line[i] === ',' && !q) { cells.push(cur.trim()); cur = ''; }
-      else { cur += line[i]; }
+    for (const ch of line) {
+      if (ch === '"') { q = !q; }
+      else if (ch === ',' && !q) { cells.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
     }
     cells.push(cur.trim());
     return cells;
   });
 }
 
-// ═══════════════════════════════════════════════
-//  CSV → DATA MAPPER
-//  Colonnes détectées automatiquement par nom.
-//  Colonnes supportées (noms flexibles) :
-//    Ticker / Code / Symbole / Valeur
-//    Nom / Société / Company / Libellé
-//    Pays / Country
-//    Secteur / Sector / Activité
-//    Prix / Price / Cours / Dernier / Last
-//    Devise / Currency
-//    Var1J / Var1D / VariationJour / DailyChange
-//    PerfYTD / Performance / Perf / Rendement
-//    Poids / Weight / Allocation / Pondération
-//    Signal / Avis / Recommandation
-//    Gérant / Manager
-// ═══════════════════════════════════════════════
-function processCSV(text, sourceName) {
-  hideError();
+// ═══════════════════════════════════
+//  PROCESS — détecte colonnes auto
+// ═══════════════════════════════════
+function processCSV(text, srcName) {
+  hideErr();
   const rows = parseCSV(text);
-  if (rows.length < 2) { showError('Fichier vide ou illisible.'); clearTable(); return; }
+  if (rows.length < 2) { showErr('Fichier vide.'); return; }
 
-  const h = rows[0].map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''));
+  // Normalise les noms de colonnes
+  const h = rows[0].map(c =>
+    c.toLowerCase()
+     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+     .replace(/[^a-z0-9]/g, '')
+  );
 
   const col = (...names) => {
     for (const n of names) {
@@ -415,207 +485,177 @@ function processCSV(text, sourceName) {
     return null;
   };
 
+  // Mapping flexible — couvre les noms du fichier Excel client
   const idx = {
-    ticker:   col('ticker','code','isin','symbole','valeur'),
-    name:     col('nom','name','societe','company','libelle'),
-    country:  col('pays','country'),
-    sector:   col('secteur','sector','activite'),
-    price:    col('prix','price','cours','dernier','last'),
-    currency: col('devise','currency','monnaie'),
-    var1d:    col('var1j','var1d','variation1','varjour','daily','change'),
-    perf:     col('ytd','perfytd','performance','perf','rendement'),
-    weight:   col('poids','weight','alloc','ponderation'),
-    signal:   col('signal','avis','recommand'),
-    manager:  col('gerant','manager','gestionnaire'),
+    valeur:       col('valeur', 'nom', 'name', 'societe', 'company', 'libelle', 'titre'),
+    ticker:       col('ticker', 'code', 'symbole', 'isin'),
+    pays:         col('pays', 'country'),
+    gerant:       col('gerant', 'manager', 'gestionnaire'),
+    achatCours:   col('achatcours', 'achat-cours', 'prixachat', 'coursachat', 'achat'),
+    achatDate:    col('achatdate', 'achat-date', 'dateachat', 'dateda'),
+    venteCours:   col('ventecours', 'vente-cours', 'prixvente', 'coursvente'),
+    venteDate:    col('ventedate', 'vente-date', 'datevente'),
+    dernierCours: col('derniercours', 'dernier', 'last', 'prix', 'price', 'cours'),
+    perf:         col('perf', 'performance', 'rendement', 'ytd', 'variation'),
+    devise:       col('devise', 'currency', 'monnaie'),
   };
 
-  const str = (r, i) => (i !== null && r[i]) ? r[i].replace(/^"|"$/g,'').trim() : '';
+  const str = (r, i) => (i !== null && r[i] != null) ? r[i].replace(/^"|"$/g, '').trim() : '';
   const num = (r, i) => {
     if (i === null || !r[i]) return null;
-    const v = parseFloat(r[i].replace(/[^0-9.,+\-]/g,'').replace(',','.'));
+    const v = parseFloat(str(r, i).replace(/[^0-9.,+\-]/g, '').replace(',', '.'));
     return isNaN(v) ? null : v;
   };
 
-  const parsed = rows.slice(1)
+  DATA = rows.slice(1)
     .filter(r => r.join('').trim())
     .map(r => ({
-      ticker:   str(r, idx.ticker)   || '—',
-      name:     str(r, idx.name)     || '—',
-      country:  str(r, idx.country)  || '',
-      sector:   str(r, idx.sector)   || '—',
-      price:    num(r, idx.price),
-      currency: str(r, idx.currency) || '€',
-      var1d:    num(r, idx.var1d),
-      perf:     num(r, idx.perf),
-      weight:   num(r, idx.weight),
-      manager:  str(r, idx.manager)  || '',
-      signal:   (str(r, idx.signal) || 'hold')
-                  .toLowerCase()
-                  .replace('achat','buy')
-                  .replace('conservation','hold')
-                  .replace('surveillance','watch'),
+      valeur:       str(r, idx.valeur)       || str(r, idx.ticker) || '—',
+      ticker:       str(r, idx.ticker)       || '',
+      pays:         str(r, idx.pays)         || '',
+      gerant:       str(r, idx.gerant)       || '',
+      achatCours:   num(r, idx.achatCours),
+      achatDate:    str(r, idx.achatDate)    || '',
+      venteCours:   num(r, idx.venteCours),
+      venteDate:    str(r, idx.venteDate)    || '',
+      dernierCours: num(r, idx.dernierCours),
+      perf:         num(r, idx.perf),
+      devise:       str(r, idx.devise)       || '€',
     }))
-    .filter(r => r.ticker && r.ticker !== '—');
+    .filter(r => r.valeur && r.valeur !== '—');
 
-  if (!parsed.length) {
-    showError('Aucune ligne valide détectée. Vérifiez les en-têtes de colonnes.\n\nEn-têtes lus : ' + rows[0].join(', '));
-    clearTable();
-    return;
-  }
+  if (!DATA.length) { showErr('Aucune ligne valide. Vérifiez les en-têtes : ' + rows[0].join(', ')); return; }
 
-  data = parsed;
+  // Nom du gérant dans le header
+  const g = DATA.find(r => r.gerant)?.gerant || 'Portefeuille';
+  document.getElementById('managerName').textContent = g;
+  document.getElementById('footerSrc').textContent   = srcName;
 
-  // Détecte le nom du gérant si présent
-  const firstManager = data.find(r => r.manager)?.manager;
-  document.getElementById('managerName').textContent = firstManager || 'Portefeuille';
-
-  const now = new Date();
-  const ts  = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-  document.getElementById('lastUpdateVal').textContent = ts;
-  document.getElementById('footerDate').textContent    = ts;
-
-  updateStats();
   render();
 }
 
-// ═══════════════════════════════════════════════
-//  STATS
-// ═══════════════════════════════════════════════
-function updateStats() {
-  if (!data.length) return;
-  const tw  = data.reduce((s,r) => s + (r.weight||0), 0);
-  const ap  = tw ? data.reduce((s,r) => s + (r.perf||0)*(r.weight||0), 0) / tw : 0;
-  const withPerf = data.filter(r => r.perf != null);
-  const best = withPerf.length ? withPerf.reduce((a,b) => (b.perf > a.perf ? b : a)) : null;
-
-  document.getElementById('statTotal').textContent    = data.length;
-  document.getElementById('statTotalSub').textContent = tw > 0 ? 'Poids total : ' + tw.toFixed(1) + '%' : 'Poids non renseigné';
-  document.getElementById('statLines').textContent    = data.length;
-
-  const pe = document.getElementById('statPerf');
-  if (withPerf.length) {
-    pe.textContent  = (ap >= 0 ? '+' : '') + ap.toFixed(2) + '%';
-    pe.className    = 'stat-value ' + (ap >= 0 ? 'pos' : 'neg');
-  } else {
-    pe.textContent = '—';
-  }
-
-  if (best) {
-    document.getElementById('statBest').textContent    = (best.perf >= 0 ? '+' : '') + best.perf.toFixed(2) + '%';
-    document.getElementById('statBestName').textContent = best.ticker + ' — ' + best.name.split(' ')[0];
-  }
-}
-
-// ═══════════════════════════════════════════════
-//  SORT
-// ═══════════════════════════════════════════════
-function sortBy(col) {
-  if (sortCol === col) sortAsc = !sortAsc;
-  else { sortCol = col; sortAsc = (col === 'ticker' || col === 'name'); }
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('btn-' + col);
-  if (btn) btn.classList.add('active');
-  render();
-}
-
-function getSorted(arr) {
-  return [...arr].sort((a,b) => {
-    let va = a[sortCol] ?? (typeof a[sortCol] === 'string' ? '' : -Infinity);
-    let vb = b[sortCol] ?? (typeof b[sortCol] === 'string' ? '' : -Infinity);
-    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
-    const r = va < vb ? -1 : va > vb ? 1 : 0;
-    return sortAsc ? r : -r;
-  });
-}
-
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
 //  RENDER
-// ═══════════════════════════════════════════════
-function render() {
-  const q    = document.getElementById('searchInput').value.toLowerCase();
-  let rows   = data;
-  if (q) rows = rows.filter(r =>
-    r.ticker.toLowerCase().includes(q) ||
-    r.name.toLowerCase().includes(q) ||
-    r.sector.toLowerCase().includes(q) ||
-    r.country.toLowerCase().includes(q)
-  );
-  rows = getSorted(rows);
+// ═══════════════════════════════════
+function getRows() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  let rows = [...DATA];
 
-  const tb   = document.getElementById('tableBody');
-  const maxW = Math.max(...data.map(r => r.weight || 0), 0.1);
+  // Filter statut
+  if (activeFilter === 'open')   rows = rows.filter(r => !r.venteDate);
+  if (activeFilter === 'closed') rows = rows.filter(r =>  r.venteDate);
+  if (activeFilter === 'pos')    rows = rows.filter(r => (r.perf ?? calcPerf(r)) > 0);
+  if (activeFilter === 'neg')    rows = rows.filter(r => (r.perf ?? calcPerf(r)) < 0);
+
+  // Search
+  if (q) rows = rows.filter(r =>
+    r.valeur.toLowerCase().includes(q) ||
+    r.ticker.toLowerCase().includes(q) ||
+    r.gerant.toLowerCase().includes(q) ||
+    r.pays.toLowerCase().includes(q)
+  );
+
+  // Sort
+  if (sortKey) {
+    rows.sort((a, b) => {
+      let va = sortKey === 'perf' ? (a.perf ?? calcPerf(a) ?? -9999) : (a[sortKey] ?? '');
+      let vb = sortKey === 'perf' ? (b.perf ?? calcPerf(b) ?? -9999) : (b[sortKey] ?? '');
+      if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return sortAsc ? va - vb : vb - va;
+    });
+  }
+  return rows;
+}
+
+function calcPerf(r) {
+  const ref  = r.venteCours || r.dernierCours;
+  const base = r.achatCours;
+  if (!ref || !base) return null;
+  return (ref - base) / base * 100;
+}
+
+function fmtNum(n, d = 2) {
+  if (n == null) return '—';
+  return n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+function render() {
+  const rows = getRows();
+  const tbody = document.getElementById('tbody');
+
+  document.getElementById('footerCount').textContent =
+    rows.length + ' position' + (rows.length > 1 ? 's' : '');
 
   if (!rows.length) {
-    tb.innerHTML = `<tr class="state-row"><td colspan="9" style="color:var(--text-muted)">Aucun résultat pour cette recherche.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Aucune position correspondante.</td></tr>`;
     return;
   }
 
-  const SIG = { buy:'Achat', hold:'Conservation', watch:'Surveillance' };
+  tbody.innerHTML = rows.map((r, i) => {
+    const p    = r.perf ?? calcPerf(r);
+    const open = !r.venteDate;
+    const flag = FLAGS[r.pays] || '';
 
-  tb.innerHTML = rows.map((r, i) => {
-    const v1c = (r.var1d  > 0 ? 'pos' : r.var1d  < 0 ? 'neg' : 'neutral');
-    const pc  = (r.perf   > 0 ? 'pos' : r.perf   < 0 ? 'neg' : 'neutral');
-    const wp  = r.weight ? (r.weight / maxW * 100).toFixed(0) : '0';
-    const sc  = ['buy','hold','watch'].includes(r.signal) ? r.signal : 'hold';
-    const priceFmt = r.price != null
-      ? r.price.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2})
-      : '—';
-    const delay = Math.min(i * 0.02, 0.5);
+    const perfHTML = p != null
+      ? `<span class="perf-badge ${p > 0 ? 'up' : p < 0 ? 'down' : 'flat'}">${p >= 0 ? '▲' : '▼'} ${fmtNum(Math.abs(p))} %</span>`
+      : '<span style="color:var(--text-muted)">—</span>';
 
-    return `<tr style="animation-delay:${delay}s">
-      <td class="row-num">${i+1}</td>
-      <td><span class="ticker-val">${e(r.ticker)}</span></td>
+    return `<tr class="${open ? '' : 'closed'}" style="animation-delay:${i * 15}ms">
       <td>
-        <div class="company-name">${e(r.name)}</div>
-        ${r.country ? `<div class="company-sub">${e(r.country)}</div>` : ''}
+        <div class="val-name">${flag} ${esc(r.valeur.split('(')[0].trim())}</div>
+        ${r.ticker ? `<div class="val-ticker">${esc(r.ticker)}</div>` : ''}
       </td>
-      <td><span class="sector-badge">${e(r.sector)}</span></td>
-      <td class="price-cell">
-        <span class="price-main">${priceFmt}</span>
-        <span class="price-currency">${e(r.currency)}</span>
-      </td>
-      <td style="text-align:right">
-        <span class="var-badge ${v1c}">${r.var1d != null ? (r.var1d > 0 ? '+' : '') + r.var1d.toFixed(2) + '%' : '—'}</span>
-      </td>
-      <td style="text-align:right">
-        <span class="var-badge ${pc}">${r.perf != null ? (r.perf > 0 ? '+' : '') + r.perf.toFixed(2) + '%' : '—'}</span>
-      </td>
-      <td style="text-align:right">
-        <div class="weight-bar-wrap">
-          <div class="weight-bar"><div class="weight-fill" style="width:${wp}%"></div></div>
-          <span class="weight-num">${r.weight != null ? r.weight.toFixed(1) + '%' : '—'}</span>
-        </div>
-      </td>
-      <td style="text-align:center"><span class="signal ${sc}">${SIG[sc] || sc}</span></td>
+      <td>${flag} ${esc(r.pays)}</td>
+      <td>${r.gerant ? `<span class="gerant-badge">${esc(r.gerant)}</span>` : '—'}</td>
+      <td class="r">${r.achatCours != null ? `<span class="price-val">${fmtNum(r.achatCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
+      <td class="r date-val">${esc(r.achatDate) || '—'}</td>
+      <td class="r">${r.venteCours != null ? `<span class="price-val">${fmtNum(r.venteCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
+      <td class="r date-val">${esc(r.venteDate) || '—'}</td>
+      <td class="r">${r.dernierCours != null ? `<span class="price-val">${fmtNum(r.dernierCours)}</span><span class="price-cur">${esc(r.devise)}</span>` : '—'}</td>
+      <td class="r">${perfHTML}</td>
+      <td><span class="status-pill ${open ? 'open' : 'closed'}">${open ? '● Ouverte' : 'Clôturée'}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════
+//  CONTROLS
+// ═══════════════════════════════════
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function sort(key, th) {
+  sortAsc = sortKey === key ? !sortAsc : true;
+  sortKey = key;
+  document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
+  th.classList.add('sorted');
+  render();
+}
+
+// ═══════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════════════════
-function e(s) {
+// ═══════════════════════════════════
+function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function setLoading(msg) {
-  document.getElementById('tableBody').innerHTML =
-    `<tr class="state-row"><td colspan="9"><span class="spinner"></span>${msg}</td></tr>`;
+function setLoading() {
+  document.getElementById('tbody').innerHTML =
+    `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Chargement…</td></tr>`;
 }
 
-function clearTable() {
-  document.getElementById('tableBody').innerHTML =
-    `<tr class="state-row"><td colspan="9"><span class="empty-icon">⚠️</span><div class="empty-msg">Impossible de charger les données.<br>Vérifiez la source et réessayez.</div></td></tr>`;
-}
-
-function showError(msg) {
-  const el = document.getElementById('errorBanner');
+function showErr(msg) {
+  const el = document.getElementById('errBox');
   el.textContent = '⚠ ' + msg;
   el.style.display = 'block';
 }
 
-function hideError() {
-  document.getElementById('errorBanner').style.display = 'none';
+function hideErr() {
+  document.getElementById('errBox').style.display = 'none';
 }
 </script>
 </body>
