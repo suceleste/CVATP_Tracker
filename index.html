@@ -78,13 +78,11 @@ td{padding:10px 12px;font-size:12px;white-space:nowrap}
 <div class="tw">
   <table>
     <thead><tr>
-      <th onclick="srt('valeur',this)">Valeur</th>
+      <th onclick="srt('nom',this)">Valeur</th>
       <th onclick="srt('pays',this)">Pays</th>
-      <th class="r" onclick="srt('achatCours',this)">Achat</th>
-      <th class="r" onclick="srt('achatDate',this)">Date achat</th>
-      <th class="r" onclick="srt('venteCours',this)">Vente</th>
-      <th class="r" onclick="srt('venteDate',this)">Date vente</th>
-      <th class="r" onclick="srt('dernierCours',this)">Dernier cours</th>
+      <th class="r" onclick="srt('prix',this)">Dernier cours</th>
+      <th class="r" onclick="srt('dateAchat',this)">Date achat</th>
+      <th class="r" onclick="srt('dateVente',this)">Date vente</th>
       <th class="r" onclick="srt('perf',this)">Perf. %</th>
       <th>Statut</th>
     </tr></thead>
@@ -98,68 +96,75 @@ td{padding:10px 12px;font-size:12px;white-space:nowrap}
 </div>
 
 <script>
-// ── URL du CSV dans le repo GitHub ──────────────────────────────────
+// URL du CSV dans le repo GitHub
 const CSV_URL = 'https://raw.githubusercontent.com/suceleste/CVATP_Tracker/main/data.csv';
 
-// ── Filtre gérant via ?gerant=Alain+Pitous dans l'URL de l'iframe ───
+// Filtre gérant via ?gerant=Alain+Pitous dans l'URL
 const GERANT = new URLSearchParams(location.search).get('gerant') || '';
 
 const FLAGS = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'🇩🇪'};
 let DATA=[], filt='all', sk=null, sa=true;
 
-// ── CHARGEMENT ───────────────────────────────────────────────────────
+// Colonnes du CSV : Ticker,Nom,Pays,Gérant,Prix,Devise,PerfYTD,Statut,Date achat,Date vente
 fetch(CSV_URL)
   .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
   .then(csv => {
-    const rows = csv.trim().split('\n').map(l => l.split(',').map(c => c.trim()));
-    const h    = rows[0].map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''));
-    const ci   = (...ns) => { for(const n of ns){ const i=h.findIndex(c=>c.includes(n)); if(i>=0)return i; } return -1; };
+    const lines = csv.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+
+    const ci = name => headers.findIndex(h =>
+      h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').includes(name)
+    );
 
     const I = {
-      valeur: ci('valeur','nom','libelle'),
-      pays:   ci('pays'),
-      gerant: ci('gerant','manager'),
-      ac:     ci('achatcours'),
-      ad:     ci('achatdate'),
-      vc:     ci('ventecours'),
-      vd:     ci('ventedate'),
-      ticker: ci('ticker'),
-      dc:     ci('derniercours','dernier'),
-      perf:   ci('perf'),
-      devise: ci('devise','currency'),
+      ticker:    ci('ticker'),
+      nom:       ci('nom'),
+      pays:      ci('pays'),
+      gerant:    ci('gerant'),
+      prix:      ci('prix'),
+      devise:    ci('devise'),
+      perf:      ci('perfytd'),
+      statut:    ci('statut'),
+      dateAchat: ci('dateachat'),
+      dateVente: ci('datevente'),
     };
 
-    const s = (r,i) => i>=0 && r[i] ? r[i].replace(/^"|"$/g,'').trim() : '';
+    const s = (r,i) => i>=0 && r[i] ? r[i].trim() : '';
     const n = (r,i) => { if(i<0||!r[i]) return null; const v=parseFloat(r[i].replace(',','.')); return isNaN(v)?null:v; };
 
-    let parsed = rows.slice(1).filter(r=>r.join('').trim() && s(r,I.valeur)).map(r => {
-      const ac=n(r,I.ac), vc=n(r,I.vc), dc=n(r,I.dc);
-      let perf=n(r,I.perf);
-      if(perf==null){ const ref=vc||dc; if(ref&&ac) perf=Math.round((ref-ac)/ac*10000)/100; }
-      const ticker=s(r,I.ticker);
-      let devise=s(r,I.devise);
-      if(!devise){ if(/^(EPA|ETR|AMS):/.test(ticker)) devise='EUR'; else if(/^LON:/.test(ticker)) devise='GBX'; else if(/^CPH:/.test(ticker)) devise='DKK'; else devise='USD'; }
-      return { valeur:s(r,I.valeur).split('(')[0].trim(), ticker, pays:s(r,I.pays), gerant:s(r,I.gerant), achatCours:ac, achatDate:s(r,I.ad), venteCours:vc, venteDate:s(r,I.vd), dernierCours:dc, perf, devise };
-    });
+    let parsed = lines.slice(1).filter(l=>l.trim()).map(line => {
+      const r = line.split(',');
+      return {
+        ticker:    s(r,I.ticker),
+        nom:       s(r,I.nom),
+        pays:      s(r,I.pays),
+        gerant:    s(r,I.gerant),
+        prix:      n(r,I.prix),
+        devise:    s(r,I.devise)||'USD',
+        perf:      n(r,I.perf),
+        statut:    s(r,I.statut),
+        dateAchat: s(r,I.dateAchat),
+        dateVente: s(r,I.dateVente),
+      };
+    }).filter(r => r.ticker || r.nom);
 
-    if(GERANT) parsed = parsed.filter(r => r.gerant.toLowerCase()===GERANT.toLowerCase());
+    if(GERANT) parsed = parsed.filter(r => r.gerant.toLowerCase() === GERANT.toLowerCase());
     if(!parsed.length){ showErr(GERANT ? `Aucune position pour "${GERANT}".` : 'Fichier vide.'); return; }
 
     DATA = parsed;
-    document.getElementById('hdName').textContent = GERANT || (parsed.find(r=>r.gerant)?.gerant) || 'Portefeuille';
+    document.getElementById('hdName').textContent = GERANT || parsed.find(r=>r.gerant)?.gerant || 'Portefeuille';
     render();
   })
   .catch(e => showErr('Impossible de charger le CSV : ' + e.message));
 
-// ── RENDER ───────────────────────────────────────────────────────────
 function getRows(){
   const q=(document.getElementById('q').value||'').toLowerCase();
   let r=[...DATA];
-  if(filt==='open')   r=r.filter(x=>!x.venteDate);
-  if(filt==='closed') r=r.filter(x=> x.venteDate);
+  if(filt==='open')   r=r.filter(x=>x.statut.toLowerCase().includes('ouverte'));
+  if(filt==='closed') r=r.filter(x=>x.statut.toLowerCase().includes('cl'));
   if(filt==='pos')    r=r.filter(x=>(x.perf??0)>0);
   if(filt==='neg')    r=r.filter(x=>(x.perf??0)<0);
-  if(q) r=r.filter(x=>x.valeur.toLowerCase().includes(q)||x.ticker.toLowerCase().includes(q)||x.pays.toLowerCase().includes(q));
+  if(q) r=r.filter(x=>x.nom.toLowerCase().includes(q)||x.ticker.toLowerCase().includes(q)||x.pays.toLowerCase().includes(q));
   if(sk) r.sort((a,b)=>{
     let va=a[sk]??-Infinity, vb=b[sk]??-Infinity;
     if(typeof va==='string')return sa?va.localeCompare(vb,'fr'):vb.localeCompare(va,'fr');
@@ -171,19 +176,20 @@ function getRows(){
 function render(){
   const list=getRows();
   document.getElementById('cnt').textContent=list.length+' position'+(list.length>1?'s':'');
-  if(!list.length){ document.getElementById('tbody').innerHTML=`<tr><td colspan="9" class="em">Aucune position.</td></tr>`; return; }
+  if(!list.length){ document.getElementById('tbody').innerHTML=`<tr><td colspan="7" class="em">Aucune position.</td></tr>`; return; }
   document.getElementById('tbody').innerHTML=list.map((r,i)=>{
-    const open=!r.venteDate, fl=FLAGS[r.pays]||'', p=r.perf;
-    const ph=p!=null?`<span class="pb ${p>0?'up':p<0?'dn':'fl'}">${p>=0?'▲':'▼'} ${fm(Math.abs(p))} %</span>`:'<span style="color:var(--txm)">—</span>';
-    const pr=v=>v!=null?`<span class="pc">${fm(v)}</span>`:'—';
+    const open = r.statut.toLowerCase().includes('ouverte');
+    const fl   = FLAGS[r.pays]||'';
+    const p    = r.perf;
+    const ph   = p!=null
+      ? `<span class="pb ${p>0?'up':p<0?'dn':'fl'}">${p>=0?'▲':'▼'} ${fm(Math.abs(p))} %</span>`
+      : '<span style="color:var(--txm)">—</span>';
     return `<tr class="${open?'':'cl'}" style="animation-delay:${i*10}ms">
-      <td><div class="vn">${fl} ${e(r.valeur)}</div><div class="vt">${e(r.ticker)}</div></td>
+      <td><div class="vn">${fl} ${e(r.nom)}</div><div class="vt">${e(r.ticker)}</div></td>
       <td>${fl} ${e(r.pays)}</td>
-      <td class="r">${r.achatCours!=null?`${pr(r.achatCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
-      <td class="r dv">${e(r.achatDate)||'—'}</td>
-      <td class="r">${r.venteCours!=null?`${pr(r.venteCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
-      <td class="r dv">${e(r.venteDate)||'—'}</td>
-      <td class="r">${r.dernierCours!=null?`${pr(r.dernierCours)}<span class="cu">${r.devise}</span>`:'—'}</td>
+      <td class="r">${r.prix!=null?`<span class="pc">${fm(r.prix)}</span><span class="cu">${e(r.devise)}</span>`:'—'}</td>
+      <td class="r dv">${e(r.dateAchat)||'—'}</td>
+      <td class="r dv">${e(r.dateVente)||'—'}</td>
       <td class="r">${ph}</td>
       <td><span class="sp ${open?'op':'cl2'}">${open?'● Ouverte':'Clôturée'}</span></td>
     </tr>`;
