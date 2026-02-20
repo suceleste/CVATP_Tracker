@@ -208,21 +208,10 @@ const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'
   document.getElementById('managerName').textContent = GERANT_FILTRE || 'Portefeuille';
 
 
-  if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') {
-    loadDemoData();
-  } else {
-    showErr('Impossible de charger le Google Sheet : ' + e.message + ' — Vérifiez que le Sheet est partagé en accès public.');
-  }
   
-
-  // Rafraîchissement auto toutes les 5 minutes
-  setInterval(async () => {
-    if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') return;
-    try {
-      const res = await fetch(SHEET_URL + '&t=' + Date.now());
-      if (res.ok) { processCSV(await res.text()); }
-    } catch(e) {}
-  }, 5 * 60 * 1000);
+  loadDemoData();
+ 
+  
 })();
 
 // ═══════════════════════════════════════════════════════
