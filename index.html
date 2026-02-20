@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portefeuille — Alain Pitous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090b;
+    --surface: #111114;
+    --surface2: #17171b;
+    --border: #1f1f25;
+    --border-light: #2a2a32;
+    --text: #e4e4e7;
+    --text-muted: #52525b;
+    --text-dim: #71717a;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.07);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.07);
+    --accent: #6366f1;
+    --accent-glow: rgba(99,102,241,0.12);
+    --gold: #f59e0b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'DM Mono',monospace;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    font-size:12.5px;
+    line-height:1.5;
+  }
+
+  /* HEADER */
+  .header {
+    padding:24px 28px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--surface);
+  }
+  .manager-tag { font-size:9.5px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--text-muted); margin-bottom:3px; }
+  .manager-name { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; letter-spacing:-.02em; color:var(--text); }
+  .header-right { display:flex; align-items:center; gap:18px; }
+  .last-update { text-align:right; font-size:10.5px; color:var(--text-muted); line-height:1.6; }
+  .last-update strong { color:var(--text-dim); }
+  .live-badge {
+    display:flex; align-items:center; gap:6px;
+    background:var(--green-bg); border:1px solid rgba(34,197,94,.2); border-radius:4px;
+    padding:5px 10px; font-size:9.5px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--green);
+  }
+  .live-dot { width:5px; height:5px; background:var(--green); border-radius:50%; animation:blink 2s ease-in-out infinite; flex-shrink:0; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* STATS */
+  .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--border); }
+  .stat-cell { padding:14px 24px; border-right:1px solid var(--border); position:relative; overflow:hidden; transition:background .15s; }
+  .stat-cell:last-child { border-right:none; }
+  .stat-cell:hover { background:var(--surface2); }
+  .stat-label { font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; }
+  .stat-value { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--text); letter-spacing:-.01em; }
+  .stat-sub { font-size:10px; color:var(--text-muted); margin-top:2px; }
+  .pos { color:var(--green); }
+  .neg { color:var(--red); }
+
+  /* TOOLBAR */
+  .toolbar {
+    padding:10px 20px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--border); background:var(--surface); gap:10px;
+  }
+  .search-wrap { position:relative; flex:1; max-width:280px; }
+  .search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+  .search-input {
+    width:100%; background:var(--bg); border:1px solid var(--border-light); border-radius:4px;
+    padding:6px 10px 6px 30px; color:var(--text); font-family:'DM Mono',monospace; font-size:11.5px; outline:none; transition:border-color .2s;
+  }
+  .search-input::placeholder { color:var(--text-muted); }
+  .search-input:focus { border-color:var(--accent); }
+  .toolbar-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .sort-btn {
+    background:var(--bg); border:1px solid var(--border-light); border-radius:4px;
+    padding:5px 10px; color:var(--text-dim); font-family:'DM Mono',monospace; font-size:10.5px;
+    cursor:pointer; transition:all .15s; letter-spacing:.03em;
+  }
+  .sort-btn:hover { border-color:var(--accent); color:var(--text); }
+  .sort-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
+  .data-source { font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
+  .data-source a { color:var(--accent); text-decoration:none; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { width:100%; border-collapse:collapse; }
+  thead tr { border-bottom:1px solid var(--border-light); }
+  th {
+    padding:10px 16px; font-size:9.5px; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--text-muted); text-align:left; background:var(--surface); cursor:pointer;
+    user-select:none; white-space:nowrap; transition:color .15s; position:sticky; top:0; z-index:1;
+  }
+  th:hover { color:var(--text-dim); }
+  th.sort-asc::after { content:' ↑'; color:var(--accent); }
+  th.sort-desc::after { content:' ↓'; color:var(--accent); }
+
+  tbody tr { border-bottom:1px solid var(--border); transition:background .12s; animation:fadeRow .3s ease forwards; opacity:0; }
+  tbody tr:hover { background:var(--surface2); }
+  @keyframes fadeRow { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+  td { padding:11px 16px; font-size:12px; color:var(--text); white-space:nowrap; }
+
+  .row-num { color:var(--text-muted); font-size:10px; text-align:center; }
+  .ticker { font-weight:500; color:var(--accent); letter-spacing:.05em; font-size:11.5px; }
+  .company-name { font-size:12px; color:var(--text); }
+  .company-sub { font-size:10px; color:var(--text-muted); margin-top:1px; }
+  .sector-badge {
+    display:inline-block; padding:2px 7px; border-radius:3px; font-size:9.5px;
+    background:var(--surface2); border:1px solid var(--border-light); color:var(--text-dim); white-space:nowrap;
+  }
+  .price-cell { text-align:right; font-feature-settings:"tnum"; }
+  .price-main { font-weight:500; font-size:12.5px; }
+  .price-currency { font-size:10px; color:var(--text-muted); margin-left:2px; }
+  .variation-cell { text-align:right; }
+  .var-badge {
+    display:inline-flex; align-items:center; gap:3px;
+    padding:3px 8px; border-radius:3px; font-size:11px; font-weight:500; font-feature-settings:"tnum";
+  }
+  .var-badge.pos { background:var(--green-bg); color:var(--green); }
+  .var-badge.neg { background:var(--red-bg); color:var(--red); }
+  .var-badge.neutral { background:var(--surface2); color:var(--text-dim); }
+  .weight-cell { text-align:right; }
+  .weight-bar-wrap { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+  .weight-bar { width:48px; height:3px; background:var(--border-light); border-radius:2px; overflow:hidden; flex-shrink:0; }
+  .weight-fill { height:100%; background:var(--accent); border-radius:2px; transition:width .6s ease; }
+  .weight-num { font-size:11.5px; font-feature-settings:"tnum"; color:var(--text); min-width:38px; text-align:right; }
+  .signal-cell { text-align:center; }
+  .signal { display:inline-block; padding:3px 8px; border-radius:3px; font-size:9.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+  .signal.buy  { background:rgba(34,197,94,.12);  color:var(--green);  border:1px solid rgba(34,197,94,.2);  }
+  .signal.hold { background:rgba(245,158,11,.10); color:var(--gold);   border:1px solid rgba(245,158,11,.2); }
+  .signal.watch{ background:rgba(99,102,241,.10); color:var(--accent); border:1px solid rgba(99,102,241,.2); }
+
+  /* LOADING */
+  .loading-row td { text-align:center; padding:40px; color:var(--text-muted); }
+  .spinner { display:inline-block; width:16px; height:16px; border:2px solid var(--border-light); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* FOOTER */
+  .footer {
+    padding:12px 24px; border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--surface); font-size:10px; color:var(--text-muted); gap:12px; flex-wrap:wrap;
+  }
+  .footer-left { display:flex; align-items:center; gap:14px; }
+  .footer-item { display:flex; align-items:center; gap:5px; }
+  .footer-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+  /* CONFIG BANNER */
+  .config-banner {
+    background:var(--accent-glow); border-bottom:1px solid rgba(99,102,241,.2);
+    padding:9px 20px; display:flex; align-items:center; gap:10px; font-size:11px; color:var(--accent); flex-wrap:wrap;
+  }
+  .config-banner input {
+    flex:1; min-width:200px; background:transparent; border:none; border-bottom:1px dashed rgba(99,102,241,.4);
+    color:var(--text); font-family:'DM Mono',monospace; font-size:11px; padding:1px 4px; outline:none;
+  }
+  .config-banner input::placeholder { color:rgba(99,102,241,.5); }
+  .config-btn {
+    background:var(--accent); color:white; border:none; border-radius:3px;
+    padding:5px 12px; font-family:'DM Mono',monospace; font-size:10.5px; cursor:pointer; white-space:nowrap; transition:opacity .15s;
+  }
+  .config-btn:hover { opacity:.85; }
+  .config-btn.secondary { background:var(--surface2); color:var(--text-dim); border:1px solid var(--border-light); }
+
+  @media(max-width:768px){
+    .header { padding:16px; flex-wrap:wrap; }
+    .stats-strip { grid-template-columns:repeat(2,1fr); }
+    .stat-cell:nth-child(2){ border-right:none; }
+    .manager-name { font-size:17px; }
+    .header-right { flex-wrap:wrap; gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER -->
+<div class="config-banner" id="configBanner">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+  <span>Google Sheet URL :</span>
+  <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/VOTRE_ID_ICI/..." />
+  <button class="config-btn" onclick="loadFromSheet()">Connecter</button>
+  <button class="config-btn secondary" onclick="document.getElementById('configBanner').style.display='none'">Fermer (demo)</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="manager-tag">Portefeuille · Gérant</div>
+    <div class="manager-name" id="managerName">Alain Pitous</div>
+  </div>
+  <div class="header-right">
+    <div class="last-update" id="lastUpdate">
+      <div>Simulation</div>
+      <strong id="lastUpdateVal">—</strong>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span>Temps réel</div>
+  </div>
+</div>
+
+<!-- TOOLBAR 
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Rechercher ticker, société, secteur…" oninput="filterRows()">
+  </div>
+  <div class="toolbar-right">
+    <button class="sort-btn" id="btn-ticker" onclick="sortBy('ticker')">Ticker</button>
+    <button class="sort-btn active" id="btn-weight" onclick="sortBy('weight')">Poids</button>
+    <button class="sort-btn" id="btn-perf" onclick="sortBy('perf')">Perf. YTD</button>
+    <button class="sort-btn" id="btn-var1d" onclick="sortBy('var1d')">Var. 1J</button>
+    <div class="data-source" id="dataSourceLabel">
+      <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Demo data
+    </div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table id="portfolioTable">
+    <thead>
+      <tr>
+        <th style="width:36px;text-align:center">#</th>
+        <th style="width:95px" onclick="sortBy('ticker')">Ticker</th>
+        <th onclick="sortBy('name')">Société</th>
+        <th style="width:140px">Secteur</th>
+        <th style="width:100px;text-align:right" onclick="sortBy('price')">Cours</th>
+        <th style="width:90px;text-align:right" onclick="sortBy('var1d')">Var. 1J</th>
+        <th style="width:100px;text-align:right" onclick="sortBy('perf')">Perf. YTD</th>
+        <th style="width:120px;text-align:right" onclick="sortBy('weight')">Poids</th>
+        <th style="width:100px;text-align:center">Signal</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr class="loading-row"><td colspan="9"><span class="spinner"></span>Chargement…</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-left">
+    <div class="footer-item">
+      <span class="footer-dot" style="background:var(--green)"></span>
+      <span>Cours : Google Finance / Tradingview</span>
+    </div>
+    <div class="footer-item">
+      <span class="footer-dot" style="background:var(--accent)"></span>
+      <span>Source : Google Sheets</span>
+    </div>
+  </div>
+  <div>CVATP · MAJ : <span id="footerDate">—</span></div>
+</div>
+
+<script>
+/* ═══════════ DEMO DATA (basé sur portefeuille type gérant FR) ═══════════ */
+const DEMO = [
+  {ticker:'ASML',   name:'ASML Holding',       country:'Pays-Bas', sector:'Semi-conducteurs', price:715.20, currency:'€', var1d:+1.43, perf:+12.8, weight:8.2,  signal:'buy'},
+  {ticker:'AIR',    name:'Airbus Group',        country:'France',   sector:'Aéronautique',     price:158.94, currency:'€', var1d:-0.31, perf:+7.2,  weight:7.6,  signal:'hold'},
+  {ticker:'MC',     name:'LVMH',                country:'France',   sector:'Luxe',             price:596.10, currency:'€', var1d:+0.88, perf:+4.1,  weight:7.1,  signal:'hold'},
+  {ticker:'SAP',    name:'SAP SE',              country:'Allemagne',sector:'Logiciels ERP',    price:214.30, currency:'€', var1d:+2.14, perf:+18.3, weight:6.8,  signal:'buy'},
+  {ticker:'SIE',    name:'Siemens AG',          country:'Allemagne',sector:'Industrie',        price:189.75, currency:'€', var1d:-0.54, perf:+3.6,  weight:6.2,  signal:'watch'},
+  {ticker:'TTE',    name:'TotalEnergies',       country:'France',   sector:'Énergie',          price:57.44,  currency:'€', var1d:+0.21, perf:-2.4,  weight:5.8,  signal:'hold'},
+  {ticker:'SAN',    name:'Sanofi',              country:'France',   sector:'Santé',            price:91.87,  currency:'€', var1d:+0.64, perf:+5.9,  weight:5.5,  signal:'buy'},
+  {ticker:'OR',     name:"L'Oréal",             country:'France',   sector:'Cosmétiques',      price:314.55, currency:'€', var1d:-1.20, perf:-4.7,  weight:5.1,  signal:'watch'},
+  {ticker:'RMS',    name:'Hermès International',country:'France',   sector:'Luxe',             price:2143.00,currency:'€', var1d:+1.75, perf:+9.4,  weight:4.9,  signal:'buy'},
+  {ticker:'SU',     name:'Schneider Electric',  country:'France',   sector:'Énergie',          price:228.90, currency:'€', var1d:+0.93, perf:+14.6, weight:4.7,  signal:'buy'},
+  {ticker:'AXA',    name:'AXA SA',              country:'France',   sector:'Assurance',        price:38.12,  currency:'€', var1d:-0.08, perf:+6.1,  weight:4.2,  signal:'hold'},
+  {ticker:'BNP',    name:'BNP Paribas',         country:'France',   sector:'Bancaire',         price:72.45,  currency:'€', var1d:+0.55, perf:+11.2, weight:3.9,  signal:'buy'},
+  {ticker:'NOVO B', name:'Novo Nordisk',        country:'Danemark', sector:'Pharma',           price:548.60, currency:'DKK',var1d:-2.31,perf:-18.5, weight:3.6,  signal:'watch'},
+  {ticker:'ALO',    name:'Alstom',              country:'France',   sector:'Transport',        price:17.84,  currency:'€', var1d:+1.12, perf:+22.3, weight:3.2,  signal:'buy'},
+  {ticker:'DG',     name:'Vinci SA',            country:'France',   sector:'Construction',     price:104.30, currency:'€', var1d:+0.23, perf:+2.8,  weight:2.9,  signal:'hold'},
+  {ticker:'AI',     name:'Air Liquide',         country:'France',   sector:'Chimie',           price:141.20, currency:'€', var1d:-0.41, perf:+1.5,  weight:2.7,  signal:'hold'},
+  {ticker:'WKL',    name:'Wolters Kluwer',      country:'Pays-Bas', sector:'Édition pro',      price:156.70, currency:'€', var1d:+0.67, perf:+8.7,  weight:2.4,  signal:'buy'},
+  {ticker:'RI',     name:'Pernod Ricard',       country:'France',   sector:'Spiritueux',       price:83.10,  currency:'€', var1d:-0.95, perf:-9.2,  weight:2.1,  signal:'watch'},
+  {ticker:'AF',     name:'Air France-KLM',      country:'France',   sector:'Aérien',           price:8.94,   currency:'€', var1d:+1.33, perf:+15.6, weight:1.8,  signal:'buy'},
+  {ticker:'VIE',    name:'Veolia',              country:'France',   sector:'Services',         price:28.60,  currency:'€', var1d:+0.28, perf:+4.3,  weight:1.6,  signal:'hold'},
+];
+
+/* ═══════════ STATE ═══════════ */
+let data = [];
+let sortCol = 'weight';
+let sortAsc = false;
+
+/* ═══════════ BOOT ═══════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  data = [...DEMO];
+  updateStats();
+  render();
+  setTimestamp();
+});
+
+function setTimestamp() {
+  const now = new Date();
+  const s = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lastUpdateVal').textContent = s;
+  document.getElementById('footerDate').textContent = s;
+}
+
+/* ═══════════ GOOGLE SHEETS LOADER ═══════════ */
+async function loadFromSheet() {
+  const raw = document.getElementById('sheetUrlInput').value.trim();
+  if (!raw) { alert('Collez l\'URL de votre Google Sheet public.'); return; }
+
+  const m = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!m) { alert('URL invalide. Ex: https://docs.google.com/spreadsheets/d/VOTRE_ID/...'); return; }
+
+  const id = m[1];
+  const tab = (raw.match(/gid=(\d+)/) || [])[1] || '0';
+  const url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${tab}`;
+
+  document.getElementById('tableBody').innerHTML = `<tr class="loading-row"><td colspan="9"><span class="spinner"></span>Connexion au Google Sheet…</td></tr>`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} — vérifiez que le Sheet est public`);
+    const csv = await res.text();
+    const rows = parseCSV(csv);
+    if (rows.length < 2) throw new Error('Feuille vide ou non lisible');
+
+    data = sheetToData(rows);
+    if (!data.length) throw new Error('Aucune ligne parsée — vérifiez les colonnes');
+
+    document.getElementById('configBanner').style.display = 'none';
+    document.getElementById('dataSourceLabel').innerHTML =
+      `<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>&nbsp;<a href="${raw}" target="_blank">Sheet connecté ✓</a>`;
+
+    updateStats();
+    render();
+    setTimestamp();
+    document.getElementById('lastUpdate').querySelector('div').textContent = 'Mise à jour';
+
+  } catch(e) {
+    alert(`Erreur : ${e.message}\n\nAssurez-vous que le Sheet est partagé "Tout le monde avec le lien peut voir".`);
+    data = [...DEMO];
+    render();
+  }
+}
+
+/* ═══════════ CSV PARSER ═══════════ */
+function parseCSV(text) {
+  return text.trim().split(/\r?\n/).map(line => {
+    const cells = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { q = !q; }
+      else if (line[i] === ',' && !q) { cells.push(cur.trim()); cur = ''; }
+      else { cur += line[i]; }
+    }
+    cells.push(cur.trim());
+    return cells;
+  });
+}
+
+/* ═══════════ SHEET → DATA MAPPER ═══════════
+   Colonnes attendues dans le Sheet (ordre flexible) :
+   Ticker | Nom/Société | Pays | Secteur | Prix | Devise | Var1J% | PerfYTD% | Poids% | Signal
+═══════════════════════════════════════════════ */
+function sheetToData(rows) {
+  const h = rows[0].map(c => c.toLowerCase().replace(/[^a-z0-9]/g,''));
+  const col = name => { for(const n of name){ const i=h.findIndex(c=>c.includes(n)); if(i>=0)return i; } return null; };
+
+  const idx = {
+    ticker:   col(['ticker','code','isin','symbole','valeur']),
+    name:     col(['nom','name','societe','company','libell']),
+    country:  col(['pays','country']),
+    sector:   col(['secteur','sector','activit']),
+    price:    col(['prix','price','cours','dernier','last']),
+    currency: col(['devise','currency','monnaie']),
+    var1d:    col(['var1j','var1d','variation1','varjour','daily','change']),
+    perf:     col(['ytd','perfytd','performance','perf','rendement']),
+    weight:   col(['poids','weight','alloc','ponderation']),
+    signal:   col(['signal','avis','recommand']),
+  };
+
+  const str = (r,i) => i!==null&&r[i] ? r[i].replace(/^"|"$/g,'').trim() : '';
+  const num = (r,i) => { if(i===null||!r[i])return 0; return parseFloat(r[i].replace(/[^0-9.,+\-]/g,'').replace(',','.'))||0; };
+
+  return rows.slice(1).filter(r => r.join('').trim() && str(r, idx.ticker)).map(r => ({
+    ticker:   str(r,idx.ticker) || '—',
+    name:     str(r,idx.name)   || '—',
+    country:  str(r,idx.country)|| '',
+    sector:   str(r,idx.sector) || '—',
+    price:    num(r,idx.price),
+    currency: str(r,idx.currency)||'€',
+    var1d:    num(r,idx.var1d),
+    perf:     num(r,idx.perf),
+    weight:   num(r,idx.weight),
+    signal:  (str(r,idx.signal)||'hold').toLowerCase().replace('achat','buy').replace('conservation','hold').replace('surveillance','watch'),
+  }));
+}
+
+/* ═══════════ STATS BAR ═══════════ */
+function updateStats() {
+  if (!data.length) return;
+  const tw = data.reduce((s,r)=>s+r.weight,0);
+  const ap = tw ? data.reduce((s,r)=>s+r.perf*r.weight,0)/tw : 0;
+  const best = data.reduce((a,b)=>b.perf>a.perf?b:a);
+
+  document.getElementById('statTotal').textContent = data.length + ' lignes';
+  document.getElementById('statTotalSub').textContent = 'Poids total : ' + tw.toFixed(1) + '%';
+
+  const pe = document.getElementById('statPerf');
+  pe.textContent = (ap>=0?'+':'')+ap.toFixed(2)+'%';
+  pe.className = 'stat-value '+(ap>=0?'pos':'neg');
+
+  document.getElementById('statLines').textContent = data.length;
+  document.getElementById('statBest').textContent = (best.perf>=0?'+':'')+best.perf.toFixed(2)+'%';
+  document.getElementById('statBestName').textContent = best.ticker+' — '+best.name.split(' ')[0];
+}
+
+/* ═══════════ SORT ═══════════ */
+function sortBy(col) {
+  if (sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=(col==='ticker'||col==='name'); }
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('btn-'+col);
+  if (btn) btn.classList.add('active');
+  render();
+}
+
+function sorted(arr) {
+  return [...arr].sort((a,b)=>{
+    let va=a[sortCol]??0, vb=b[sortCol]??0;
+    if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}
+    const r=va<vb?-1:va>vb?1:0;
+    return sortAsc?r:-r;
+  });
+}
+
+/* ═══════════ FILTER ═══════════ */
+function filterRows() { render(); }
+
+function filtered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if (!q) return data;
+  return data.filter(r =>
+    r.ticker.toLowerCase().includes(q) ||
+    r.name.toLowerCase().includes(q) ||
+    r.sector.toLowerCase().includes(q) ||
+    r.country.toLowerCase().includes(q)
+  );
+}
+
+/* ═══════════ RENDER ═══════════ */
+function render() {
+  const rows = sorted(filtered());
+  const maxW = Math.max(...data.map(r=>r.weight), 0.1);
+  const tb = document.getElementById('tableBody');
+
+  if (!rows.length) {
+    tb.innerHTML = `<tr class="loading-row"><td colspan="9" style="color:var(--text-muted)">Aucun résultat.</td></tr>`;
+    return;
+  }
+
+  const SIGNALS = {buy:'Achat', hold:'Conservation', watch:'Surveillance'};
+
+  tb.innerHTML = rows.map((r,i) => {
+    const v1c = r.var1d>0?'pos':r.var1d<0?'neg':'neutral';
+    const pc  = r.perf >0?'pos':r.perf <0?'neg':'neutral';
+    const wp  = (r.weight/maxW*100).toFixed(0);
+    const sc  = ['buy','hold','watch'].includes(r.signal)?r.signal:'hold';
+    const sl  = SIGNALS[sc]||sc;
+    const delay = Math.min(i*0.025, 0.5);
+    const priceStr = r.price > 0 ? r.price.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+
+    return `<tr style="animation-delay:${delay}s">
+      <td class="row-num">${i+1}</td>
+      <td><span class="ticker">${e(r.ticker)}</span></td>
+      <td>
+        <div class="company-name">${e(r.name)}</div>
+        ${r.country?`<div class="company-sub">${e(r.country)}</div>`:''}
+      </td>
+      <td><span class="sector-badge">${e(r.sector)}</span></td>
+      <td class="price-cell">
+        <span class="price-main">${priceStr}</span>
+        <span class="price-currency">${e(r.currency)}</span>
+      </td>
+      <td class="variation-cell">
+        <span class="var-badge ${v1c}">${r.var1d!==0?(r.var1d>0?'+':'')+r.var1d.toFixed(2)+'%':'—'}</span>
+      </td>
+      <td class="variation-cell">
+        <span class="var-badge ${pc}">${r.perf!==0?(r.perf>0?'+':'')+r.perf.toFixed(2)+'%':'—'}</span>
+      </td>
+      <td class="weight-cell">
+        <div class="weight-bar-wrap">
+          <div class="weight-bar"><div class="weight-fill" style="width:${wp}%"></div></div>
+          <span class="weight-num">${r.weight>0?r.weight.toFixed(1)+'%':'—'}</span>
+        </div>
+      </td>
+      <td class="signal-cell"><span class="signal ${sc}">${sl}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function e(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
