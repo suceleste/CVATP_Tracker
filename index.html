@@ -204,16 +204,21 @@ const FLAGS      = {US:'🇺🇸',FR:'🇫🇷',GB:'🇬🇧',DK:'🇩🇰',DE:'
 //  INIT — charge au démarrage
 // ═══════════════════════════════════════════════════════
 (async function init() {
-  // Affiche le nom du gérant dans le header immédiatement
   document.getElementById('managerName').textContent = GERANT_FILTRE || 'Portefeuille';
 
-  
+  // Si pas encore configuré → démo directement, pas de fetch inutile
   if (SHEET_ID === 'VOTRE_SHEET_ID_ICI') {
-    loadDemoData();
-  } else {
+    await loadDemoData();
+    return;
+  }
+
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+    processCSV(await res.text());
+  } catch(e) {
     showErr('Impossible de charger le Google Sheet : ' + e.message + ' — Vérifiez que le Sheet est partagé en accès public.');
   }
-  
 
   // Rafraîchissement auto toutes les 5 minutes
   setInterval(async () => {
@@ -269,10 +274,10 @@ function processCSV(text, srcName) {
     valeur:       col('valeur','nom','libelle','societe'),
     pays:         col('pays','country'),
     gerant:       col('gerant','manager'),
-    achatCours:   col('achatcours','achat-cours','achatco'),
-    achatDate:    col('achatdate','achat-date','achatda'),
-    venteCours:   col('ventecours','vente-cours','venteco'),
-    venteDate:    col('ventedate','vente-date','venteda'),
+    achatCours:   col('achatcours','achatco','achat-cours'),
+    achatDate:    col('achatdate','achatda','achat-date'),
+    venteCours:   col('ventecours','venteco','vente-cours'),
+    venteDate:    col('ventedate','venteda','vente-date'),
     ticker:       col('ticker','code','symbole'),
     dernierCours: col('derniercours','dernier','last'),
     perf:         col('perf','performance','rendement'),
@@ -354,11 +359,34 @@ function processCSV(text, srcName) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  DONNÉES DE DÉMO (fallback si SHEET_ID pas encore configuré)
+//  DONNÉES DE DÉMO — fetch le CSV depuis GitHub
+//  → Mettre le fichier portefeuille-alain-pitous.csv
+//    dans le repo GitHub à la racine
 // ═══════════════════════════════════════════════════════
 function loadDemoData() {
-  const csv = 'https://raw.githubusercontent.com/suceleste/CVATP_Tracker/main/data.csv';
-
+  const csv = [
+    'Valeur,Pays,Pays entier,Gérant,Achat - Emission,Achat - Cours,Achat - Date,Vente - Emission,Vente - Cours,Vente - Date,Ticker,Dernier cours,Perf. %',
+    'AEROVIRONMENT INC. (AVAV) USD,US,Etats-Unis,Alain Pitous,2025-12-05,287.45,2025-12-04,,,,NASDAQ:AVAV,265.46,',
+    'AES CORPORATION (AES) USD,US,Etats-Unis,Alain Pitous,2025-09-19,12.95,2025-09-18,,,,NYSE:AES,16.29,',
+    'AMERICAN ELECTRIC POWER (AEP) USD,US,Etats-Unis,Alain Pitous,2025-12-05,118.04,2025-12-04,,,,NASDAQ:AEP,127.27,',
+    'ATLASSIAN (TEAM) USD,US,Etats-Unis,Alain Pitous,2024-03-22,197.26,2024-03-21,2025-06-27,198.50,2025-06-26,NASDAQ:TEAM,83.61,',
+    'CONSTELLATION ENERGY (CEG) USD,US,Etats-Unis,Alain Pitous,2025-09-19,322.71,2025-09-18,,,,NASDAQ:CEG,294.05,',
+    'DELL TECHNOLOGIES (DELL) USD,US,Etats-Unis,Alain Pitous,2025-06-27,125.98,2025-06-26,,,,NYSE:DELL,116.78,',
+    'NEBIUS GROUP (NBIS) USD,US,Etats-Unis,Alain Pitous,2026-01-09,97.30,2026-01-08,,,,NASDAQ:NBIS,101.80,',
+    'FIRST SOLAR (FSLR) USD,US,Etats-Unis,Alain Pitous,2025-02-07,167.67,2025-02-06,,,,NASDAQ:FSLR,238.57,',
+    'GE VERNOVA (GEV) USD,US,Etats-Unis,Alain Pitous,2024-10-04,254.68,2024-10-03,2025-09-19,387.11,2025-09-18,NYSE:GEV,817.55,',
+    'IBM (IBM) USD,US,Etats-Unis,Alain Pitous,2025-02-07,253.44,2025-02-06,,,,NYSE:IBM,260.79,',
+    'INTEL (INTC) USD,US,Etats-Unis,Alain Pitous,2024-11-08,26.23,2024-11-07,2025-02-07,19.38,2025-02-06,NASDAQ:INTC,45.46,',
+    'INTUITIVE SURGICAL (ISRG) USD,US,Etats-Unis,Alain Pitous,2025-02-07,588.50,2025-02-06,2025-06-27,534.19,2025-06-26,NASDAQ:ISRG,500.76,',
+    'IONQ (IONQ) USD,US,Etats-Unis,Alain Pitous,2024-11-08,22.11,2024-11-07,2025-09-19,66.81,2025-09-18,NYSE:IONQ,33.34,',
+    'MICROVAST HOLDINGS (MVST) USD,US,Etats-Unis,Alain Pitous,2025-06-27,3.92,2025-06-26,,,,NASDAQ:MVST,2.33,',
+    'NOVO NORDISK (NOVO B) DKK,DK,Danemark,Alain Pitous,2025-02-07,635.00,2025-02-06,,,,CPH:NOVO-B,308.90,',
+    'ROCKET LAB (RKLB) USD,US,Etats-Unis,Alain Pitous,2024-10-04,9.25,2024-10-03,,,,NASDAQ:RKLB,74.42,',
+    'VISA (V) USD,US,Etats-Unis,Alain Pitous,2025-03-21,339.50,2025-03-20,,,,NYSE:V,320.30,',
+    'AMD (ADVANCED MICRO DEVICES) USD,US,Etats-Unis,Frédéric Rozier,2023-11-10,113.49,2023-11-09,2025-10-10,232.89,2025-10-09,NASDAQ:AMD,200.12,',
+    'AIRBUS SE (AIR) EUR,FR,France,Christian Bito,2024-05-31,159.10,2024-05-30,2025-06-13,162.80,2025-06-12,EPA:AIR,186.74,',
+    'MERCK & CO. (MRK) USD,US,Etats-Unis,Céline Piquemal-Prade,2023-09-15,108.24,2023-09-14,2025-06-20,79.29,2025-06-18,NYSE:MRK,121.66,',
+  ].join('\n');
   processCSV(csv, 'Démo');
 }
 
